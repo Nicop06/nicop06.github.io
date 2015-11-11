@@ -2,7 +2,7 @@
 layout: post
 title:  "Building a Cheap NAS and Media Center"
 date:   2015-11-11
-categories: server hardware
+categories: hardware
 ---
 
 This post will intends to tell the story of how I built a new NAS and media center from scratch, including hardware an software part.
