@@ -4,7 +4,7 @@ title: About
 permalink: /about/
 ---
 
-My name is Nicolas Porcel. I am currently a Software Engineer [Amadeus](www.amadeus.com). Before that, I studied at [Supelec](http://www.supelec.fr/), a French engineering school. If you want to know more about my curriculum, you can download my [CV](cv-nporcel.pdf).
+My name is Nicolas Porcel. I am currently a Software Engineer [Amadeus](www.amadeus.com). Before that, I studied at [Supelec](http://www.supelec.fr/), a French engineering school. If you want to know more about my curriculum, you can download my [CV](/assets/cv-nporcel.pdf).
 
 I am passioned about Open Source technologies, and especially Linux. I currently am running [Archlinux](https://www.archlinux.org) and [Gentoo](https://www.gentoo.org/) on my personal laptop. As a developer, I find a lot of benefits to using an Open Source system, such as having full control of your system, the flexibility in its configuration and the freedom of choosing the software that best fit my needs.
 
