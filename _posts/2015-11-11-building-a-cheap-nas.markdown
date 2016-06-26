@@ -1,5 +1,8 @@
---- layout: post title: "How to build a NAS for 300€" date: 2015-11-11
-categories: hardware ---
+---
+layout: post
+title: "How to build a NAS for 300€"
+date: 2015-11-11
+---
 
 This post describes the story of how I built a new NAS and media center from
 scratch, including hardware and software part.

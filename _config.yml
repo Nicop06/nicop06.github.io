@@ -11,4 +11,4 @@ github_username: Nicop06
 
 # Build settings
 markdown: kramdown
-#permalink: pretty
+permalink: pretty
