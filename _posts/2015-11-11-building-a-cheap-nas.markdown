@@ -9,7 +9,6 @@ scratch, including hardware and software part.
 
 ## The previous setup
 
-![Optilex GX270](http://ecx.images-amazon.com/images/I/41CK1kOQBbL.jpg)
 
 It all started a few weeks ago when one of the drives on my NAS started making
 a weird noise. Since 2013, I was running an old [Optilex
@@ -20,6 +19,8 @@ in ZFS raid 1 and running [FreeBSD](https://www.freebsd.org). The motherboard
 offers "wake on lan" from full shutdown, which was great as I didn't need it to
 be constantly running. I was quite happy with this setup, but I was waiting for
 something to go wrong to upgrade to newer hardware.
+
+![Optilex GX270](http://ecx.images-amazon.com/images/I/41CK1kOQBbL.jpg)
 
 ## The new setup
 
