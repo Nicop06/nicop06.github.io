@@ -52,6 +52,35 @@ The setup I will present is such that you can easily have several distribution
 installed on the same server as long as they are Linux based and have a recent
 Kernel, so I don't have to worry too much about the one I chose.
 
+For the purpose of this article, I will show the setup using a Debian system as
+this is one of the most used distribution for this purpose, but this could
+easily be translated for another system. In a later post, I will show how to
+easily add another OS to the setup in minutes.
+
+## Drives setup
+
+The purpose of the server being providing massive and accessible storage for
+the whole network, this is the most important part of the setup. In this setup,
+I have two 1TB disks and 1 2TB disk. This is not the most optimal setup, but it
+should work.
+
+Boot your favorite live ISO and fire up a root shell. You can use the
+installation media or any other media. Make sure you have *btrfs-tools*
+installed as we will use Btrfs file system. 
+
+### Swap
+
+First, you need to chose a disk holding the swap partition. This is not
+required if you have a massive amount of RAM, but can be useful if you plan of
+hibernating your server. You could try to balance the swap over the drives,
+like putting a 2GB partition on the 2TB disk and a 1GB partition on each 1TB
+disk, but I considered losing 4GB of storage acceptable compared to the burden
+of having the swap split over 3 disks.
+
+Assuming */dev/sda* is your 2TB disks, you can run the following commands. To
+check that, running *dmesg | grep '2.00 TB'* should do the work.
+
+    # fdisk /dev/sda
 
 
   [this post]:  {% post_url 2015-11-11-building-a-cheap-nas %}
