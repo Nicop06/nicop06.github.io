@@ -1,7 +1,8 @@
 ---
 layout: post
-title:  "How to setup a NAS from scratch in 1 hour"
+title:  "How to setup a NAS in 1 hour"
 date:   2015-12-19
+tags:   Linux Btrfs
 ---
 
 This post describes setup of the NAS built in [this post][]. The NAS would have
@@ -57,6 +58,24 @@ this is one of the most used distribution for this purpose, but this could
 easily be translated for another system. In a later post, I will show how to
 easily add another OS to the setup in minutes.
 
+## Start the installation
+
+A small warning before you start. This is intended to target people with basic
+knowledge of Linux installation. If you are a beginner and this is your first
+time installing Linux, you should probably not follow this guide.
+
+You can download the latest stable Debian netinstall ISO [here][Debian
+netinst]. Once its boot, go to _Advanced Options_ and select _Expert install_.
+Then, follow the instructions until you reach the _Load installer components
+from CD_ part. You will need to select `cfdisk` or `gparted` to manually create
+your disk layout.
+
+![Debian load installer components](/assets/debian-load-installer-components.png)
+
+Continue untill you reach the _Partition disks_ part. At this point, you will
+need to stop the installation process and go to the second terminal by running
+_CTRL+ALT+F2_. You will then need to perform the manual setup.
+
 ## Drives setup
 
 The purpose of the server being providing massive and accessible storage for
@@ -65,7 +84,7 @@ I have two 1TB disks and 1 2TB disk. This is not the most optimal setup, but it
 should work.
 
 Boot your favorite live ISO and fire up a root shell. You can use the
-installation media or any other media. Make sure you have *btrfs-tools*
+installation media or any other media. Make sure you have `btrfs-tools`
 installed as we will use Btrfs file system. 
 
 ### Swap
@@ -77,18 +96,26 @@ like putting a 2GB partition on the 2TB disk and a 1GB partition on each 1TB
 disk, but I considered losing 4GB of storage acceptable compared to the burden
 of having the swap split over 3 disks.
 
-Assuming */dev/sda* is your 2TB disks, you can run the following commands. To
-check that, running *dmesg | grep '2.00 TB'* should do the work.
+Assuming `/dev/sda` is your 2TB disks, you can run the following commands. To
+check that, running `dmesg | grep '2.00 TB'` should do the work. Be careful,
+any mistake you do at this step will destroy all your data, so be certain that
+you only have emptry hard drive and the installation CD / USB plugged into the
+machine.
 
-    # fdisk /dev/sda
+{% highlight bash %}
+# fdisk /dev/sda
+{% endhighlight %}
 
 
-  [this post]:  {% post_url 2015-11-11-building-a-cheap-nas %}
-  [Kodi]:       https://kodi.tv/
-  [Btrfs]:      https://btrfs.wiki.kernel.org/index.php/Main_Page
-  [ZFS]:        https://www.freebsd.org/doc/handbook/zfs.html
-  [FreeBSD]:    https://www.freebsd.org/
-  [Debian]:     https://www.debian.org/
-  [ArchLinux]:  https://www.archlinux.org/
-  [Gentoo]:     https://www.gentoo.org/
-  [Alpine]:     https://www.alpine.org/
+
+
+  [this post]:        {% post_url 2015-11-11-building-a-cheap-nas %}
+  [Kodi]:             https://kodi.tv/
+  [Btrfs]:            https://btrfs.wiki.kernel.org/index.php/Main_Page
+  [ZFS]:              https://www.freebsd.org/doc/handbook/zfs.html
+  [FreeBSD]:          https://www.freebsd.org/
+  [Debian]:           https://www.debian.org/
+  [ArchLinux]:        https://www.archlinux.org/
+  [Gentoo]:           https://www.gentoo.org/
+  [Alpine]:           https://www.alpine.org/
+  [Debian netinst]:   https://www.debian.org/CD/netinst/
