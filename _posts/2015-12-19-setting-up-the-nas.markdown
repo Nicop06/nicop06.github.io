@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "How to setup a NAS in 1 hour"
+title:  "How to setup a NAS in 1 hour using Btrfs"
 date:   2015-12-19
 tags:   Linux Btrfs
 ---
@@ -80,14 +80,14 @@ _CTRL+ALT+F2_. You will then need to perform the manual setup.
 
 The purpose of the server being providing massive and accessible storage for
 the whole network, this is the most important part of the setup. In this setup,
-I have two 1TB disks and 1 2TB disk. This is not the most optimal setup, but it
-should work.
+I have two 1TB disks and one 2TB disk. This is not the most optimal setup, but
+it should work.
 
 Boot your favorite live ISO and fire up a root shell. You can use the
 installation media or any other media. Make sure you have `btrfs-tools`
-installed as we will use Btrfs file system. 
+installed as we will use Btrfs file system.
 
-### Swap
+### Partitioning
 
 First, you need to chose a disk holding the swap partition. This is not
 required if you have a massive amount of RAM, but can be useful if you plan of
@@ -102,11 +102,162 @@ any mistake you do at this step will destroy all your data, so be certain that
 you only have emptry hard drive and the installation CD / USB plugged into the
 machine.
 
-{% highlight bash %}
-# fdisk /dev/sda
+{% highlight shell %}
+$ fdisk /dev/sda
+
+Welcome to fdisk (util-linux 2.25.2).
+Changes will remain in memory only, until you decide to write them.
+Be careful before using the write command.
 {% endhighlight %}
 
+Create the swap partition. I will use 1GB for this tutorial.
 
+{% highlight shell %}
+Command (m for help): n
+Partition type
+   p   primary (0 primary, 0 extended, 4 free)
+   e   extended (container for logical partitions)
+Select (default p):
+
+Using default response p.
+Partition number (1-4, default 1):
+First sector (2048-16777215, default 2048):
+Last sector, +sectors or +size{K,M,G,T,P} (2048-16777215, default 16777215): +1G
+
+Created a new partition 1 of type 'Linux' and of size 1 GiB.
+{% endhighlight %}
+
+I left every options default except for the *last sector* option. Then, create
+a single partition for the whole filesystem, we will then be able to separate
+the root, var and home partitions using Btrfs subvolumes. You can optionally
+create a separated boot partition depending on the bootloader you want to use.
+I will come back to that later.
+
+{% highlight shell %}
+Command (m for help): n
+Partition type
+p   primary (1 primary, 0 extended, 3 free)
+e   extended (container for logical partitions)
+Select (default p):
+
+Using default response p.
+Partition number (2-4, default 2):
+First sector (2099200-16777215, default 2099200):
+Last sector, +sectors or +size{K,M,G,T,P} (2099200-16777215, default 16777215):
+
+Created a new partition 2 of type 'Linux' and of size 7 GiB.
+
+Command (m for help): w
+The partition table has been altered.
+Calling ioctl() to re-read partition table.
+Syncing disks.
+{% endhighlight %}
+
+Here, I create the main Btrfs partition and write the result. In case you are
+wandering why the size of the partition is only 7GB, this is because I am
+copy pasting the commands from a VM install, but this should be exactly the
+same as a regular install. I will not create any partition on the other disks
+as Btrfs can use a whole disk. But you might want to do so in order to install
+create MBR headers allowing the bootload on all disks.
+
+Also, you could use GPT partitioning and UEFI, but if your motherboard allow
+you to boot in legacy mode I strongly recommend doing so. This will save you
+some troubles like the creation of a EFI partition or setting the bios flag.
+The setup is complicated enough.
+
+### Swap
+
+You can then create the swap with the following command:
+
+{% highlight shell %}
+$ mkswap /dev/sda1
+Setting up swapspace version 1, size = 1073737728 bytes
+UUID=fc6d3f5d-8e2a-4ce3-8d3d-ba13c08a617e
+{% endhighlight %}
+
+### Btrfs setup
+
+You are now ready to perform the Btrfs setup. Please note the name of the
+different partitions you want to use to create the Btrfs volume. In my case,
+this would be `/dev/sda`, `/dev/sdb` and `/dev/sdc`. It might be something else
+depending on your setup. You can then run the following command.
+
+{% highlight shell %}
+$ modprobe btrfs
+$ mkfs.btrfs -L nas -m raid1 -d raid1 /dev/sda2 /dev/sdb /dev/sdc
+Btrfs v3.17
+See http://btrfs.wiki.kernel.org for more information.
+
+Turning ON incompat feature 'extref': increased hardlink limit per file to 65536
+adding device /dev/sdb id 2
+adding device /dev/sdc id 3
+fs created label nas on /dev/sda2
+        nodesize 16384 leafsize 16384 sectorsize 4096 size 15.00GiB
+{% endhighlight %}
+
+The `-L nas` create a label on the filesystem so that you can mount it using
+the label instead of the UUID. The `-m raid1` and `-d raid1` allow to write
+respectively the metadata and the data on 2 different disks. Btrfs will
+automatically handle the poll of heterogeneous disks. Even if it's not
+recommended, it works.
+
+Then, you need to mount the newly created Btrfs volume.
+
+{% highlight shell %}
+$ mount /dev/sda2 /mnt
+{% endhighlight %}
+
+Then, check that everything is in RAID1 by running:
+
+{% highlight shell %}
+$ btrfs filesystem df /mnt/
+Data, RAID1: total=1.00GiB, used=512.00KiB
+Data, single: total=8.00MiB, used=0.00B
+System, RAID1: total=8.00MiB, used=16.00KiB
+System, single: total=4.00MiB, used=0.00B
+Metadata, RAID1: total=1.00GiB, used=112.00KiB
+Metadata, single: total=8.00MiB, used=0.00B
+GlobalReserve, single: total=16.00MiB, used=0.00B
+{% endhighlight %}
+
+If you see *single* like on my output, just run the following command.
+
+{% highlight shell %}
+$ btrfs balance /mnt/
+Done, had to relocate 6 out of 6 chunks
+{% endhighlight %}
+
+Now, let's create the subvolumes. I use a subvolume for the root partition.
+This has several advantages, like being able to easily install a new OS on the
+same volume or to snapshot the partition for backup or other purpose. I'll show
+you my backup setup in another article.
+
+{% highlight shell %}
+$ btrfs subvolume create /mnt/debian/
+Create subvolume '/mnt/debian'
+$ btrfs subvolume create /mnt/debian/root/
+Create subvolume '/mnt/debian/root'
+$ btrfs subvolume create /mnt/debian/var
+Create subvolume '/mnt/debian/var'
+$ btrfs subvolume create /mnt/debian/home
+Create subvolume '/mnt/debian/home'
+{% endhighlight %}
+
+Finally, mount the different subvolumes such that debian can install the base
+system. You may want to have a look to [Btrfs mount options][] in case for
+instance your use SSD or you want to enable compression.
+
+{% highlight shell %}
+$ mkdir /target
+$ mount -o subvol=debian/root /dev/sda2 /target
+$ mkdir /target/var
+$ mount -o subvol=debian/var /dev/sda2 /target/var
+$ mkdir /target/home
+$ mount -o subvol=debian/home /dev/sda2 /target/home
+{% endhighlight %}
+
+Now, go back to the installation media by typing *CTRL+ALT+F1*, skip the
+partitioning step and run directly the *install the base system* step.
 
 
   [this post]:        {% post_url 2015-11-11-building-a-cheap-nas %}
@@ -119,3 +270,6 @@ machine.
   [Gentoo]:           https://www.gentoo.org/
   [Alpine]:           https://www.alpine.org/
   [Debian netinst]:   https://www.debian.org/CD/netinst/
+  [Btrfs mount options]: https://btrfs.wiki.kernel.org/index.php/Mount_options
+  [Btrfs multiple devices]: https://btrfs.wiki.kernel.org/index.php/Using_Btrfs_with_Multiple_Devices
+  [Btrfs multiple use cases]: https://btrfs.wiki.kernel.org/index.php/UseCases
