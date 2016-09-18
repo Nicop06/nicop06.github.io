@@ -97,7 +97,7 @@ destroy all your data. In my case, I only had empty disks and the installation
 media so I didn't have to worry too much.
 
 {% highlight shell %}
-$ fdisk /dev/sda
+/# fdisk /dev/sda
 
 Welcome to fdisk (util-linux 2.25.2).
 Changes will remain in memory only, until you decide to write them.
@@ -159,7 +159,7 @@ bootloader on those disks.
 You can then create the swap with the following command:
 
 {% highlight shell %}
-$ mkswap /dev/sda1
+/# mkswap /dev/sda1
 Setting up swapspace version 1, size = 1073737728 bytes
 UUID=fc6d3f5d-8e2a-4ce3-8d3d-ba13c08a617e
 {% endhighlight %}
@@ -172,8 +172,8 @@ this would be `/dev/sda`, `/dev/sdb` and `/dev/sdc`. It might be something else
 depending on your setup. You can then run the following commands.
 
 {% highlight shell %}
-$ modprobe btrfs
-$ mkfs.btrfs -L nas -m raid1 -d raid1 /dev/sda2 /dev/sdb /dev/sdc
+/# modprobe btrfs
+/# mkfs.btrfs -L nas -m raid1 -d raid1 /dev/sda2 /dev/sdb /dev/sdc
 Btrfs v3.17
 See http://btrfs.wiki.kernel.org for more information.
 
@@ -192,13 +192,13 @@ handle the poll of heterogeneous disks.
 Then, you need to mount the newly created Btrfs volume.
 
 {% highlight shell %}
-$ mount /dev/sda2 /mnt
+/# mount /dev/sda2 /mnt
 {% endhighlight %}
 
 Check that every data are mirrored by running:
 
 {% highlight shell %}
-$ btrfs filesystem df /mnt/
+/# btrfs filesystem df /mnt/
 Data, RAID1: total=1.00GiB, used=512.00KiB
 Data, single: total=8.00MiB, used=0.00B
 System, RAID1: total=8.00MiB, used=16.00KiB
@@ -214,7 +214,7 @@ loss of 1 disk. If you see *single* like on my output, just run the following
 command. 
 
 {% highlight shell %}
-$ btrfs balance /mnt/
+/# btrfs balance /mnt/
 Done, had to relocate 6 out of 6 chunks
 {% endhighlight %}
 
@@ -224,13 +224,13 @@ easily install a new OS on the same volume or to snapshot the partition for
 backup or other purpose. I will dedicate another article to by backup setup.
 
 {% highlight shell %}
-$ btrfs subvolume create /mnt/debian/
+/# btrfs subvolume create /mnt/debian/
 Create subvolume '/mnt/debian'
-$ btrfs subvolume create /mnt/debian/root/
+/# btrfs subvolume create /mnt/debian/root/
 Create subvolume '/mnt/debian/root'
-$ btrfs subvolume create /mnt/debian/var
+/# btrfs subvolume create /mnt/debian/var
 Create subvolume '/mnt/debian/var'
-$ btrfs subvolume create /mnt/debian/home
+/# btrfs subvolume create /mnt/debian/home
 Create subvolume '/mnt/debian/home'
 {% endhighlight %}
 
@@ -239,15 +239,29 @@ system. You may want to have a look at the [Btrfs mount options][] in case for
 instance your use SSD or you want to enable compression.
 
 {% highlight shell %}
-$ mkdir /target
-$ mount -o subvol=debian/root /dev/sda2 /target
-$ mkdir /target/var
-$ mount -o subvol=debian/var /dev/sda2 /target/var
-$ mkdir /target/home
-$ mount -o subvol=debian/home /dev/sda2 /target/home
+/# mkdir /target
+/# mount -o subvol=debian/root /dev/sda2 /target
+/# mkdir /target/var
+/# mount -o subvol=debian/var /dev/sda2 /target/var
+/# mkdir /target/home
+/# mount -o subvol=debian/home /dev/sda2 /target/home
 {% endhighlight %}
 
-### Finishing the installation
+You also need to manually create the fstab file in */target/etc/fstab/*. Here
+is a sample file:
+
+{% highlight config %}
+LABEL=nas /       btrfs rw,relatime,subvol=debian/root 0 0
+LABEL=nas /var    btrfs rw,relatime,subvol=debian/var  0 0
+LABEL=nas /home   btrfs rw,relatime,subvol=debian/home 0 0
+
+/dev/sda1 swap swap defaults 0 0
+{% endhighlight %}
+
+You may also want to use the UUID of the disks instad of the labels and disk
+name.
+
+## Resuming the installation
 
 Now, go back to the installation media by typing *CTRL+ALT+F1*, skip the
 partitioning step and run directly the *install the base system* step. You will
@@ -267,15 +281,73 @@ as a regular volume. This has some nice applications. For instance, you can
 replace the root partition and reboot to the new one without breaking the system
 or requiring any more partition or media.
 
-When you arrive at the *select software* part, you may want to deselect the
+When you get to the *select software* part, you may want to deselect the
 desktop environment. We will use Kodi as a standalone environment.
 
-Finally, you will need to select the grub bootloader, as any other boot loader
+## The bootloader
+
+Finally, you will need to install the grub bootloader, as any other boot loader
 might not be able to boot a Btrfs filesystem. Syslinux may work but doesn't
 support compression or encryption according to the [Syslinux wiki][]. If you
 still want to use an incompatible setup, you will to create a dedicated boot
 partition formatted in FAT32 or EXT 2/3/4 for instance.
 
+Unfortunately, because of the manual partitioning, you will have to manually
+install some programs. First, you need to *chroot* into the new system. You can
+do that with the following command:
+
+{% highlight shell %}
+/# chroot /target /bin/bash
+{% endhighlight %}
+
+Then, you can install the Btrfs tools, mainly containing the `btrfs` program.
+This will also regenerate the *initramfs* to integrate the Btrfs tools in order
+to mount the root partition during boot as it is present in a subvolume. If you
+forget this step, your system will be unbootable. This is the main
+inconvenience of having the root of the system separated for the root of the
+Btrfs partition.
+
+{% highlight shell %}
+root@debian:/# apt-get install btrfs-tools
+{% endhighlight %}
+
+Finally, you can install and configure grub:
+
+{% highlight shell %}
+root@debian:/# apt-get install grub2
+{% endhighlight %}
+
+When you are asked to select the disk where to install grub, be careful not to
+select partionless disk. If you created partitions in all your disks, I
+recommend you to install grub on all the disks, as you will still be able to
+boot even if you loose one disk.
+
+Once you are done, you can directly go to the *Finish the installation* step.
+This will reboot your system, and you can now start using it.
+
+## Auto shutdown script
+
+I wanted to share a script I wrote to automatically shut down your server when
+it isn't used. You can access this script directly on my [dotfiles
+repository]() on [GitHub]().
+
+It can run in a crontab or as a daemon, regularly running different tests to
+check if the server is in use.  After some amount of time without any activity,
+it will shut down the system. You can create a configuration files to override
+some settings. Among the tests, it will check for connected users and
+established network connections. I encourage you to read the code and modify
+the script, and don't hesitate to send me feedbacks.
+
+## Final thoughts
+
+This setup might seem complicated, but it has a lot of advantages as we will
+see in another articles. Among them, you can easily install another Linux
+distribution while the current system is running without using an installation
+drive. You can also import the system on your desktop machine, test some
+changes and send them back to your server. Then, when you are ready, you can
+easily switch to the new system. Finally, you can have an unlimited number of
+online snapshots without worrying about space or performance issue. I will
+dedicate another articles to all the benefits of Btrfs.
 
 
   [the previous post]: {% post_url 2015-11-11-building-a-cheap-nas %}
@@ -288,8 +360,10 @@ partition formatted in FAT32 or EXT 2/3/4 for instance.
   [ArchLinux]:         https://www.archlinux.org/
   [Gentoo]:            https://www.gentoo.org/
   [Alpine]:            https://www.alpine.org/
+  [GitHub]:            https://github.com/
   [Debian netinst]:    https://www.debian.org/CD/netinst/
   [Btrfs mount options]: https://btrfs.wiki.kernel.org/index.php/Mount_options
   [Btrfs multiple use cases]: https://btrfs.wiki.kernel.org/index.php/UseCases
   [Syslinux wiki]: http://www.syslinux.org/wiki/index.php?title=Filesystem#Btrfs
+  [dotfiles repository]: https://github.com/Nicop06/dotfiles/blob/master/bin/auto-shutdown.sh
 
