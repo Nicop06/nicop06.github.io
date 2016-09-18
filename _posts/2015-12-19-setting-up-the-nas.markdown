@@ -328,8 +328,7 @@ This will reboot your system, and you can now start using it.
 ## Auto shutdown script
 
 I wanted to share a script I wrote to automatically shut down your server when
-it isn't used. You can access this script directly on my [dotfiles
-repository]() on [GitHub]().
+it isn't used. You can access this script directly on my [GitHub repository][].
 
 It can run in a crontab or as a daemon, regularly running different tests to
 check if the server is in use.  After some amount of time without any activity,
@@ -360,10 +359,9 @@ dedicate another articles to all the benefits of Btrfs.
   [ArchLinux]:         https://www.archlinux.org/
   [Gentoo]:            https://www.gentoo.org/
   [Alpine]:            https://www.alpine.org/
-  [GitHub]:            https://github.com/
   [Debian netinst]:    https://www.debian.org/CD/netinst/
   [Btrfs mount options]: https://btrfs.wiki.kernel.org/index.php/Mount_options
   [Btrfs multiple use cases]: https://btrfs.wiki.kernel.org/index.php/UseCases
   [Syslinux wiki]: http://www.syslinux.org/wiki/index.php?title=Filesystem#Btrfs
-  [dotfiles repository]: https://github.com/Nicop06/dotfiles/blob/master/bin/auto-shutdown.sh
+  [GitHub repository]: https://github.com/Nicop06/dotfiles/blob/master/bin/auto-shutdown.sh
 
