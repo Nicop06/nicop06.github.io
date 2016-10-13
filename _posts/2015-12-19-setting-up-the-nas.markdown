@@ -1,74 +1,76 @@
 ---
 layout: post
-title:  "How to setup a NAS in 1 hour using Btrfs"
+title:  "How to setup a NAS using Btrfs"
 date:   2015-12-19
 tags:   Linux Btrfs
 ---
 
-This post describes setup of the NAS built in [the previous post][]. The NAS
-would have two purposes. The first one would be to provide a relaliable and
-easily accessible storage to share media files and do backups. The second one
-would be to serve as a media center, using [Kodi][] for instance.
+This post will show you how to setup of the NAS built in [the previous post][].
+The NAS would have two purposes. The first one would be to provide a reliable
+and easily accessible storage to share media files and do backups. The second
+one would be to serve as a media center, using [Kodi][] for instance.
 
 ## Choosing the OS
 
 The first step of setup is to chose the best suited OS for the task. This
-wasn't easy because the video card requried a very recent kernel to work.
+wasn't easy because the video card required a very recent kernel to work.
 Also, I wanted to use a Copy-on-Write file system such as [Btrfs][] or [ZFS][]
-to allow daily snapshots of the data and avoid any loss.
+to allow daily snapshots and ease of maintenance.
 
   * [FreeBSD][]: My previous NAS was running FreeBSD, so the migration would
-    have been easy. However, the FreeBSD kernel did not support the video card,
-    which made Kodi very slow.
-  * [Debian][]: After trying FreeBSD, I decided to try one of the most famous
-    Linux distribution. But at the time, the kernel distributed in the stable
-    release was too old and did not contain the video card driver either.
+  have been easy. However, the FreeBSD kernel did not support the video card,
+  which made Kodi very slow.
+
+  * [Debian][]: After trying FreeBSD, I decided to try one of the oldest Linux
+  distribution. But at the time, the kernel distributed in the stable release
+  was too old and did not contain the video card driver either.
+
   * [ArchLinux][]: Being a rolling release, Arch has the advantage to always
-    deliver the latest softwware. The first advantage was that I could get the
-    latest Kernel so that I would be certain that if the video driver were
-    actually supported by Linux, they were present in this Kernel.
-  * [Gentoo][]: Gentoo is currently my desktop distribution. It is also a
-    rolling release and uses OpenRC instead of systemd, preventing a single
-    point of failure on my system. However, it requires you to compile any
-    package that you install, and I didn't want to spend hours updating my
-    system, as I was already doing that on my desktop.
+  deliver the latest softwware. The first advantage was that I could get the
+  latest Kernel so that I would be certain that if the video driver were
+  actually supported by Linux, they were present in this Kernel.
+
+  * [Gentoo][]: Gentoo is currently my desktop distribution. It uses [OpenRC][]
+  instead of [systemd][], which respect a lot more the [Unix philosophy][Unix]:
+  *Do One Thing and Do It Well*.  However, you need to compile any package that
+  you install, which makes make it a lot more difficult to maintain.
+
   * [Alpine][]: I am considering migrating my server to Alpine at some point.
-    As Gentoo, it uses OpenRC. Also, it is minimalist, secure by default and
-    allow to easilly mix and update binary and source based packages.
+  As Gentoo, it uses OpenRC. Also, it is minimalist, secure by default and
+  allows to easilly mix and update binary and source based packages.
 
 Why not using one of the popular NAS distribution like FreeNAS or NAS4Free?  As
 a power user, I like having full control over my server, so I prefer to use a
-rather minimalist distribution on which I can build my system as I want and
-install whatever I want.
+minimalist distribution on which I can build my system as I want and install
+whatever I want.
 
 Also, I did not mention CentOS, Ubuntu or many other distributions. Actually,
 the choice of the distribution is not critical and any Unix system would be
-perfectly suitable. My advice is t to pick whichever distribution you are
+perfectly suitable. My advice is to pick whichever distribution you are
 comfortable with, keeping in mind that you need something reliable enough so
 that you don't loose your data.
 
-The setup I will present is such that you can easily have several distributions
-installed on the same server as long as they are Linux based and have a recent
-Kernel, so I don't have to worry too much about the one I chose.
+This setup will allow you to easily installs several distributions alongside,
+so the choice of the OS is not definitive. I actually installed 3 of the
+presented OS before settling for ArchLinux.
 
-For the purpose of this article, I will show the setup using a Debian system as
-this is one of the most used distribution for this purpose, and therefore has
-an ample documentation and community to help you solve any problem you might
-encounter. But this could easily be translated for another system. In a later
-post, I will show how to easily add another OS to the setup in minutes.
+For the purpose of this article, I will show the setup using Debian :as this is
+one of the most used distribution for this purpose, and therefore has an ample
+documentation and community to help you solve any problem you might encounter.
+But this could easily be translated for another system.
 
 ## Start the installation
 
 A small warning before you start. This is intended to target people with some
 basic knowledge of Linux installation. If you are a beginner and this is your
-first time installing Linux, you should probably not follow this guide. There are a lot of simpler ways to build a NAS, at the cost of some flexibility.
+first time installing Linux, you should probably not follow this guide. There
+are a lot of simpler ways to build a NAS, at the cost of flexibility.
 
-You can download the latest stable Debian netinstall ISO [here][Debian
-netinst]. Once it boots, go to _Advanced Options_ and select _Expert install_.
-Then, follow the instructions until you reach the _Load installer components
-from CD_ part. You might want to select `cfdisk` or `gparted` to manually create
-your disk layout if you are used to them. In this post, we will directly use
-`fdisk`.
+You can download the latest stable Debian netinstall ISO [here][netinst]. Once
+it boots, go to _Advanced Options_ and select _Expert install_.  Then, follow
+the instructions until you reach the _Load installer components from CD_ part.
+You might want to select `cfdisk` or `gparted` to manually create your disk
+layout if you are used to them. In this post, we will directly use `fdisk`.
 
 ![Debian load installer components](/assets/debian-load-installer-components.png)
 
@@ -89,13 +91,13 @@ have redundancy.
 First, you need to chose a disk holding the swap partition. This is not
 required if you have a massive amount of RAM, but can be useful if you plan on
 hibernating your server. You could try to balance the swap over the drives,
-like putting a 2GB partition on the 2TB disk and a 1GB partition on each 1TB
-disk, but I considered losing 4GB of storage acceptable.
+by putting a 2GB partition on the 2TB disk and a 1GB partition on each 1TB
+disk for instance, unless you don't mind wasting a few GB.
 
-We will assume that `/dev/sda` is the 2TB disks. To check that, you can run
+We will assume that `/dev/sda` is the 2TB disk. To check that, you can run
 `dmesg | grep '2.00 TB'`. Be careful, as any mistake you do at this step can
 destroy all your data. In my case, I only had empty disks and the installation
-media so I didn't have to worry too much.
+media so I didn't have to worry.
 
 ``` shell_session
 # fdisk /dev/sda
@@ -122,11 +124,13 @@ Last sector, +sectors or +size{K,M,G,T,P} (2048-16777215, default 16777215): +1G
 Created a new partition 1 of type 'Linux' and of size 1 GiB.
 ```
 
-I left every options as default except for the *last sector* option. Then,
-create a single partition for the whole filesystem. We will separate the root,
-var and home partitions later using Btrfs subvolumes. You can optionally create
-a separated boot partition depending on the bootloader you want to use. I will
-come back on that later.
+I left every options as default except for the *last sector* option.
+
+Then, create a single partition for the whole filesystem. We will separate the
+root, var and home partitions later using Btrfs subvolumes. You can optionally
+create a separated boot partition depending on the bootloader you want to use.
+If you plan on using `grub2` and don't encrypt your hard drive you don't need
+it.
 
 ``` shell_session
 Command (m for help): n
@@ -150,10 +154,10 @@ Syncing disks.
 
 Here, I create the main Btrfs partition and write the result. In case you are
 wandering why the size of the partition is only 7GB, this is because I am using
-a VM for this page, but this should be exactly the same as a regular install. I
+a VM for this post, but this should be exactly the same as a regular install. I
 will not create any partition on the other disks as Btrfs can use a
-partitionless disk. However, this is discouraged in case you want to install a
-bootloader on those disks.
+partitionless disk. Be aware that it is not recommended to use partitionless
+disks to install the bootload to the MBR.
 
 ### Swap
 
@@ -185,10 +189,10 @@ fs created label nas on /dev/sda2
         nodesize 16384 leafsize 16384 sectorsize 4096 size 15.00GiB
 ```
 
-The `-L nas` create a label on the filesystem so that you can mount it using
-the label instead of the UUID. The `-m raid1` and `-d raid1` allow to write
-both the metadata and the data on 2 different disks. Btrfs will automatically
-handle the poll of heterogeneous disks.
+The `-L nas` creates a label on the filesystem so that you can mount it using
+the label instead of the UUID. The `-m raid1` and `-d raid1` activate raid1 for
+the metadata and the data. Btrfs will automatically handle the poll of
+heterogeneous disks.
 
 Then, you need to mount the newly created Btrfs volume.
 
@@ -221,8 +225,8 @@ Done, had to relocate 6 out of 6 chunks
 
 Now, let's create the subvolumes. For the root partition, I use a different
 root than the Btrfs tree root. This has several advantages, like being able to
-easily install a new OS on the same volume or to snapshot the partition for
-backup or other purpose. I will dedicate another article to by backup setup.
+easily install a new OS on the same volume or snapshots of your volumes. I will
+dedicate another article to by backup setup.
 
 ``` shell_session
 # btrfs subvolume create /mnt/debian/
@@ -235,9 +239,9 @@ Create subvolume '/mnt/debian/var'
 Create subvolume '/mnt/debian/home'
 ```
 
-Finally, mount the different subvolumes such that debian can install the base
-system. You may want to have a look at the [Btrfs mount options][] in case for
-instance your use SSD or you want to enable compression.
+Finally, mount the different subvolumes such that Debian can install the base
+system. You may want to have a look at the [Btrfs mount options][btrfs_mount] in case for
+instance you use SSD or you want to enable compression.
 
 ``` shell_session
 # mkdir /target
@@ -259,7 +263,7 @@ LABEL=nas /home   btrfs rw,relatime,subvol=debian/home 0 0
 /dev/sda1 swap swap defaults 0 0
 ```
 
-You may also want to use the UUID of the disks instad of the labels and disk
+You may also want to use the UUID of the disks instead of the labels and disk
 name.
 
 ## Resuming the installation
@@ -279,8 +283,8 @@ the same files than in */target* and in */target/var*.
 If you go to */mnt/debian*, you can rename any subvolume and everything will
 still work. This is as if they where regular folders, but they can be mounted
 as a regular volume. This has some nice applications. For instance, you can
-replace the root partition and reboot to the new one without breaking the system
-or requiring any more partition or media.
+replace the root partition with a snapshot and reboot the system, if you broke
+something for instance.
 
 When you get to the *select software* part, you may want to deselect the
 desktop environment. We will use Kodi as a standalone environment.
@@ -289,9 +293,9 @@ desktop environment. We will use Kodi as a standalone environment.
 
 Finally, you will need to install the grub bootloader, as any other boot loader
 might not be able to boot a Btrfs filesystem. Syslinux may work but doesn't
-support compression or encryption according to the [Syslinux wiki][]. If you
-still want to use an incompatible setup, you will to create a dedicated boot
-partition formatted in FAT32 or EXT 2/3/4 for instance.
+support compression or encryption according to the [Syslinux wiki][syslinux].
+If you still want to use an incompatible setup, you will can create a dedicated
+boot partition formatted to FAT32 or EXT 2/3/4 for instance.
 
 Unfortunately, because of the manual partitioning, you will have to manually
 install some programs. First, you need to *chroot* into the new system. You can
@@ -301,12 +305,13 @@ do that with the following command:
 # chroot /target /bin/bash
 ```
 
-Then, you can install the Btrfs tools, mainly containing the `btrfs` program.
-This will also regenerate the *initramfs* to integrate the Btrfs tools in order
-to mount the root partition during boot as it is present in a subvolume. If you
+Then, you can install the Btrfs tools containing the `btrfs` command.  This
+will also regenerate the *initramfs* to integrate the Btrfs tools in order to
+mount the root partition during boot as it is present in a subvolume. If you
 forget this step, your system will be unbootable. This is the main
 inconvenience of having the root of the system separated for the root of the
-Btrfs partition.
+Btrfs partition. The kernel alone is not able to handle such setup, so you need
+an initramfs with the `btrfs` program to mount your partitions.
 
 ``` shell_session
 root@debian# apt-get install btrfs-tools
@@ -319,24 +324,27 @@ root@debian# apt-get install grub2
 ```
 
 When you are asked to select the disk where to install grub, be careful not to
-select partionless disk. If you created partitions in all your disks, I
+select partionless disks. If you created partitions in all your disks, I
 recommend you to install grub on all the disks, as you will still be able to
 boot even if you loose one disk.
 
 Once you are done, you can directly go to the *Finish the installation* step.
 This will reboot your system, and you can now start using it.
 
+## Install some programs
+
 ## Auto shutdown script
 
 I wanted to share a script I wrote to automatically shut down your server when
-it isn't used. You can access this script directly on my [GitHub repository][].
+it isn't used. You can access this script directly on my [GitHub
+repository][github].
 
 It can run in a crontab or as a daemon, regularly running different tests to
-check if the server is in use.  After some amount of time without any activity,
+check if the server is in use. After some amount of time without any activity,
 it will shut down the system. You can create a configuration files to override
-some settings. Among the tests, it will check for connected users and
-established network connections. I encourage you to read the code and modify
-the script, and don't hesitate to send me feedbacks.
+some settings. The tests include checking for connected users and established
+network connections. I encourage you to read the code and modify the script,
+and don't hesitate to send feedback.
 
 ## Final thoughts
 
@@ -345,24 +353,25 @@ see in another articles. Among them, you can easily install another Linux
 distribution while the current system is running without using an installation
 drive. You can also import the system on your desktop machine, test some
 changes and send them back to your server. Then, when you are ready, you can
-easily switch to the new system. Finally, you can have an unlimited number of
-online snapshots without worrying about space or performance issue. I will
-dedicate another articles to all the benefits of Btrfs.
+seamlessly switch to the new system. Finally, you can have an unlimited number
+of online snapshots without worrying about space or performance issuek
 
-
-[the previous post]:        {% post_url 2015-11-11-building-a-cheap-nas %}
-[Kodi]:                     https://kodi.tv/
-[Btrfs]:                    https://btrfs.wiki.kernel.org/index.php/Main_Page
-[ZFS]:                      https://www.freebsd.org/doc/handbook/zfs.html
-[RAID]:                     https://en.wikipedia.org/wiki/Standard_RAID_levels#RAID_1
-[FreeBSD]:                  https://www.freebsd.org/
-[Debian]:                   https://www.debian.org/
-[ArchLinux]:                https://www.archlinux.org/
-[Gentoo]:                   https://www.gentoo.org/
-[Alpine]:                   https://www.alpine.org/
-[Debian netinst]:           https://www.debian.org/CD/netinst/
-[Btrfs mount options]:      https://btrfs.wiki.kernel.org/index.php/Mount_options
-[Btrfs multiple use cases]: https://btrfs.wiki.kernel.org/index.php/UseCases
-[Syslinux wiki]:            http://www.syslinux.org/wiki/index.php?title=Filesystem#Btrfs
-[GitHub repository]:        https://github.com/Nicop06/dotfiles/blob/master/bin/auto-shutdown.sh
+[prev_post]:   {% post_url 2015-11-11-building-a-cheap-nas %}
+[Kodi]:        https://kodi.tv/
+[Btrfs]:       https://btrfs.wiki.kernel.org/index.php/Main_Page
+[OpenRC]:      https://wiki.gentoo.org/wiki/OpenRC
+[systemd]:     https://www.freedesktop.org/wiki/Software/systemd/
+[Unix]: https://en.wikipedia.org/wiki/Unix_philosophy#Do_One_Thing_and_Do_It_Well
+[ZFS]:         https://www.freebsd.org/doc/handbook/zfs.html
+[RAID]:        https://en.wikipedia.org/wiki/Standard_RAID_levels#RAID_1
+[FreeBSD]:     https://www.freebsd.org/
+[Debian]:      https://www.debian.org/
+[ArchLinux]:   https://www.archlinux.org/
+[Gentoo]:      https://www.gentoo.org/
+[Alpine]:      https://www.alpine.org/
+[netinst]:     https://www.debian.org/CD/netinst/
+[btrfs_mount]: https://btrfs.wiki.kernel.org/index.php/Mount_options
+[btrfs_uc]:    https://btrfs.wiki.kernel.org/index.php/UseCases
+[syslinux]:    http://www.syslinux.org/wiki/index.php?title=Filesystem#Btrfs
+[github]:      https://github.com/Nicop06/dotfiles/blob/master/bin/auto-shutdown.sh
 
