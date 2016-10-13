@@ -81,7 +81,8 @@ _CTRL+ALT+F2_. You will then need to perform some manual setup.
 The purpose of the server is to provide accessible and reliable storage for the
 whole network, so this is the most important part of the setup. In this setup,
 I have two 1TB disks and one 2TB disk. Even if it is recommended to have disks
-of the same size, it is better to use 
+of the same size, it is possible to use all the disks in an efficient way and
+have redundancy.
 
 ### Partitioning
 
@@ -96,17 +97,17 @@ We will assume that `/dev/sda` is the 2TB disks. To check that, you can run
 destroy all your data. In my case, I only had empty disks and the installation
 media so I didn't have to worry too much.
 
-{% highlight shell %}
-/# fdisk /dev/sda
+``` shell_session
+# fdisk /dev/sda
 
 Welcome to fdisk (util-linux 2.25.2).
 Changes will remain in memory only, until you decide to write them.
 Be careful before using the write command.
-{% endhighlight %}
+```
 
 Create the swap partition. I will use 1GB for this tutorial.
 
-{% highlight shell %}
+``` shell_session
 Command (m for help): n
 Partition type
    p   primary (0 primary, 0 extended, 4 free)
@@ -119,7 +120,7 @@ First sector (2048-16777215, default 2048):
 Last sector, +sectors or +size{K,M,G,T,P} (2048-16777215, default 16777215): +1G
 
 Created a new partition 1 of type 'Linux' and of size 1 GiB.
-{% endhighlight %}
+```
 
 I left every options as default except for the *last sector* option. Then,
 create a single partition for the whole filesystem. We will separate the root,
@@ -127,7 +128,7 @@ var and home partitions later using Btrfs subvolumes. You can optionally create
 a separated boot partition depending on the bootloader you want to use. I will
 come back on that later.
 
-{% highlight shell %}
+``` shell_session
 Command (m for help): n
 Partition type
 p   primary (1 primary, 0 extended, 3 free)
@@ -145,7 +146,7 @@ Command (m for help): w
 The partition table has been altered.
 Calling ioctl() to re-read partition table.
 Syncing disks.
-{% endhighlight %}
+```
 
 Here, I create the main Btrfs partition and write the result. In case you are
 wandering why the size of the partition is only 7GB, this is because I am using
@@ -158,11 +159,11 @@ bootloader on those disks.
 
 You can then create the swap with the following command:
 
-{% highlight shell %}
-/# mkswap /dev/sda1
+``` shell_session
+# mkswap /dev/sda1
 Setting up swapspace version 1, size = 1073737728 bytes
 UUID=fc6d3f5d-8e2a-4ce3-8d3d-ba13c08a617e
-{% endhighlight %}
+```
 
 ### Btrfs setup
 
@@ -171,9 +172,9 @@ different partitions you want to use to create the Btrfs volume. In my case,
 this would be `/dev/sda`, `/dev/sdb` and `/dev/sdc`. It might be something else
 depending on your setup. You can then run the following commands.
 
-{% highlight shell %}
-/# modprobe btrfs
-/# mkfs.btrfs -L nas -m raid1 -d raid1 /dev/sda2 /dev/sdb /dev/sdc
+``` shell_session
+# modprobe btrfs
+# mkfs.btrfs -L nas -m raid1 -d raid1 /dev/sda2 /dev/sdb /dev/sdc
 Btrfs v3.17
 See http://btrfs.wiki.kernel.org for more information.
 
@@ -182,7 +183,7 @@ adding device /dev/sdb id 2
 adding device /dev/sdc id 3
 fs created label nas on /dev/sda2
         nodesize 16384 leafsize 16384 sectorsize 4096 size 15.00GiB
-{% endhighlight %}
+```
 
 The `-L nas` create a label on the filesystem so that you can mount it using
 the label instead of the UUID. The `-m raid1` and `-d raid1` allow to write
@@ -191,14 +192,14 @@ handle the poll of heterogeneous disks.
 
 Then, you need to mount the newly created Btrfs volume.
 
-{% highlight shell %}
-/# mount /dev/sda2 /mnt
-{% endhighlight %}
+``` shell_session
+# mount /dev/sda2 /mnt
+```
 
 Check that every data are mirrored by running:
 
-{% highlight shell %}
-/# btrfs filesystem df /mnt/
+``` shell_session
+# btrfs filesystem df /mnt/
 Data, RAID1: total=1.00GiB, used=512.00KiB
 Data, single: total=8.00MiB, used=0.00B
 System, RAID1: total=8.00MiB, used=16.00KiB
@@ -206,57 +207,57 @@ System, single: total=4.00MiB, used=0.00B
 Metadata, RAID1: total=1.00GiB, used=112.00KiB
 Metadata, single: total=8.00MiB, used=0.00B
 GlobalReserve, single: total=16.00MiB, used=0.00B
-{% endhighlight %}
+```
 
 You need all the blocks to use the [RAID1]() allocation level, ensuring that
 the data are written to at least 2 different disks in order to tolerate the
 loss of 1 disk. If you see *single* like on my output, just run the following
-command. 
+command.
 
-{% highlight shell %}
-/# btrfs balance /mnt/
+``` shell_session
+# btrfs balance /mnt/
 Done, had to relocate 6 out of 6 chunks
-{% endhighlight %}
+```
 
 Now, let's create the subvolumes. For the root partition, I use a different
 root than the Btrfs tree root. This has several advantages, like being able to
 easily install a new OS on the same volume or to snapshot the partition for
 backup or other purpose. I will dedicate another article to by backup setup.
 
-{% highlight shell %}
-/# btrfs subvolume create /mnt/debian/
+``` shell_session
+# btrfs subvolume create /mnt/debian/
 Create subvolume '/mnt/debian'
-/# btrfs subvolume create /mnt/debian/root/
+# btrfs subvolume create /mnt/debian/root/
 Create subvolume '/mnt/debian/root'
-/# btrfs subvolume create /mnt/debian/var
+# btrfs subvolume create /mnt/debian/var
 Create subvolume '/mnt/debian/var'
-/# btrfs subvolume create /mnt/debian/home
+# btrfs subvolume create /mnt/debian/home
 Create subvolume '/mnt/debian/home'
-{% endhighlight %}
+```
 
 Finally, mount the different subvolumes such that debian can install the base
 system. You may want to have a look at the [Btrfs mount options][] in case for
 instance your use SSD or you want to enable compression.
 
-{% highlight shell %}
-/# mkdir /target
-/# mount -o subvol=debian/root /dev/sda2 /target
-/# mkdir /target/var
-/# mount -o subvol=debian/var /dev/sda2 /target/var
-/# mkdir /target/home
-/# mount -o subvol=debian/home /dev/sda2 /target/home
-{% endhighlight %}
+``` shell_session
+# mkdir /target
+# mount -o subvol=debian/root /dev/sda2 /target
+# mkdir /target/var
+# mount -o subvol=debian/var /dev/sda2 /target/var
+# mkdir /target/home
+# mount -o subvol=debian/home /dev/sda2 /target/home
+```
 
 You also need to manually create the fstab file in */target/etc/fstab/*. Here
 is a sample file:
 
-{% highlight config %}
+``` config
 LABEL=nas /       btrfs rw,relatime,subvol=debian/root 0 0
 LABEL=nas /var    btrfs rw,relatime,subvol=debian/var  0 0
 LABEL=nas /home   btrfs rw,relatime,subvol=debian/home 0 0
 
 /dev/sda1 swap swap defaults 0 0
-{% endhighlight %}
+```
 
 You may also want to use the UUID of the disks instad of the labels and disk
 name.
@@ -296,9 +297,9 @@ Unfortunately, because of the manual partitioning, you will have to manually
 install some programs. First, you need to *chroot* into the new system. You can
 do that with the following command:
 
-{% highlight shell %}
-/# chroot /target /bin/bash
-{% endhighlight %}
+``` shell_session
+# chroot /target /bin/bash
+```
 
 Then, you can install the Btrfs tools, mainly containing the `btrfs` program.
 This will also regenerate the *initramfs* to integrate the Btrfs tools in order
@@ -307,15 +308,15 @@ forget this step, your system will be unbootable. This is the main
 inconvenience of having the root of the system separated for the root of the
 Btrfs partition.
 
-{% highlight shell %}
-root@debian:/# apt-get install btrfs-tools
-{% endhighlight %}
+``` shell_session
+root@debian# apt-get install btrfs-tools
+```
 
 Finally, you can install and configure grub:
 
-{% highlight shell %}
-root@debian:/# apt-get install grub2
-{% endhighlight %}
+``` shell_session
+root@debian# apt-get install grub2
+```
 
 When you are asked to select the disk where to install grub, be careful not to
 select partionless disk. If you created partitions in all your disks, I
@@ -349,19 +350,19 @@ online snapshots without worrying about space or performance issue. I will
 dedicate another articles to all the benefits of Btrfs.
 
 
-  [the previous post]: {% post_url 2015-11-11-building-a-cheap-nas %}
-  [Kodi]:              https://kodi.tv/
-  [Btrfs]:             https://btrfs.wiki.kernel.org/index.php/Main_Page
-  [ZFS]:               https://www.freebsd.org/doc/handbook/zfs.html
-  [RAID]:              https://en.wikipedia.org/wiki/Standard_RAID_levels#RAID_1
-  [FreeBSD]:           https://www.freebsd.org/
-  [Debian]:            https://www.debian.org/
-  [ArchLinux]:         https://www.archlinux.org/
-  [Gentoo]:            https://www.gentoo.org/
-  [Alpine]:            https://www.alpine.org/
-  [Debian netinst]:    https://www.debian.org/CD/netinst/
-  [Btrfs mount options]: https://btrfs.wiki.kernel.org/index.php/Mount_options
-  [Btrfs multiple use cases]: https://btrfs.wiki.kernel.org/index.php/UseCases
-  [Syslinux wiki]: http://www.syslinux.org/wiki/index.php?title=Filesystem#Btrfs
-  [GitHub repository]: https://github.com/Nicop06/dotfiles/blob/master/bin/auto-shutdown.sh
+[the previous post]:        {% post_url 2015-11-11-building-a-cheap-nas %}
+[Kodi]:                     https://kodi.tv/
+[Btrfs]:                    https://btrfs.wiki.kernel.org/index.php/Main_Page
+[ZFS]:                      https://www.freebsd.org/doc/handbook/zfs.html
+[RAID]:                     https://en.wikipedia.org/wiki/Standard_RAID_levels#RAID_1
+[FreeBSD]:                  https://www.freebsd.org/
+[Debian]:                   https://www.debian.org/
+[ArchLinux]:                https://www.archlinux.org/
+[Gentoo]:                   https://www.gentoo.org/
+[Alpine]:                   https://www.alpine.org/
+[Debian netinst]:           https://www.debian.org/CD/netinst/
+[Btrfs mount options]:      https://btrfs.wiki.kernel.org/index.php/Mount_options
+[Btrfs multiple use cases]: https://btrfs.wiki.kernel.org/index.php/UseCases
+[Syslinux wiki]:            http://www.syslinux.org/wiki/index.php?title=Filesystem#Btrfs
+[GitHub repository]:        https://github.com/Nicop06/dotfiles/blob/master/bin/auto-shutdown.sh
 
