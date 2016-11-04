@@ -76,9 +76,7 @@ specifications:
     connect your device to any screen
   * 7.1 HD Audio
   * USB 3.0
-  * PCIe port
-  * COM port
-  * Printer Header
+  * PCIe, COM and Print Port
 
 Nothing exceptional, but everything you except to find is there and you won't
 have any surprise. I was also surprised to see two SATA cables provided with
