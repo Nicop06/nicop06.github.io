@@ -12,7 +12,7 @@ one would be to serve as a media center, using [Kodi][] for instance.
 
 ## Choosing the OS
 
-The first step of setup is to chose the best suited OS for the task. This
+The first step of setup is to choose the most suited OS for the task. This
 wasn't easy because the video card required a very recent kernel to work.
 Also, I wanted to use a Copy-on-Write file system such as [Btrfs][] or [ZFS][]
 to allow daily snapshots and ease of maintenance.
@@ -39,7 +39,7 @@ to allow daily snapshots and ease of maintenance.
   As Gentoo, it uses OpenRC. Also, it is minimalist, secure by default and
   allows to easilly mix and update binary and source based packages.
 
-Why not using one of the popular NAS distribution like FreeNAS or NAS4Free?  As
+Why not use one of the popular NAS distribution like FreeNAS or NAS4Free?  As
 a power user, I like having full control over my server, so I prefer to use a
 minimalist distribution on which I can build my system as I want and install
 whatever I want.
@@ -48,7 +48,7 @@ Also, I did not mention CentOS, Ubuntu or many other distributions. Actually,
 the choice of the distribution is not critical and any Unix system would be
 perfectly suitable. My advice is to pick whichever distribution you are
 comfortable with, keeping in mind that you need something reliable enough so
-that you don't loose your data.
+that you don't lose your data.
 
 This setup will allow you to easily installs several distributions alongside,
 so the choice of the OS is not definitive. I actually installed 3 of the
@@ -88,7 +88,7 @@ have redundancy.
 
 ### Partitioning
 
-First, you need to chose a disk holding the swap partition. This is not
+First, you need to choose a disk holding the swap partition. This is not
 required if you have a massive amount of RAM, but can be useful if you plan on
 hibernating your server. You could try to balance the swap over the drives,
 by putting a 2GB partition on the 2TB disk and a 1GB partition on each 1TB
@@ -153,7 +153,7 @@ Syncing disks.
 ```
 
 Here, I create the main Btrfs partition and write the result. In case you are
-wandering why the size of the partition is only 7GB, this is because I am using
+wondering why the size of the partition is only 7GB, this is because I am using
 a VM for this post, but this should be exactly the same as a regular install. I
 will not create any partition on the other disks as Btrfs can use a
 partitionless disk. Be aware that it is not recommended to use partitionless
@@ -269,9 +269,9 @@ name.
 ## Resuming the installation
 
 Now, go back to the installation media by typing *CTRL+ALT+F1*, skip the
-partitioning step and run directly the *install the base system* step. You will
-certainly get the following message: ignore it by selecting `<Go Back>`. You
-might need to do that more than once.
+partitioning step and run directly the *install the base system* step. Don't
+worry if you get the following message, you can ignore it by selecting `<Go
+Back>`. You might need to do that more than once.
 
 ![Debian error partitioning](/assets/debian-error-partitioning.png)
 
@@ -294,8 +294,8 @@ desktop environment. We will use Kodi as a standalone environment.
 Finally, you will need to install the grub bootloader, as any other boot loader
 might not be able to boot a Btrfs filesystem. Syslinux may work but doesn't
 support compression or encryption according to the [Syslinux wiki][syslinux].
-If you still want to use an incompatible setup, you will can create a dedicated
-boot partition formatted to FAT32 or EXT 2/3/4 for instance.
+If you still want to use an incompatible setup, you will have to create a
+dedicated boot partition formatted to FAT32 or EXT 2/3/4 for instance.
 
 Unfortunately, because of the manual partitioning, you will have to manually
 install some programs. First, you need to *chroot* into the new system. You can
@@ -309,7 +309,7 @@ Then, you can install the Btrfs tools containing the `btrfs` command.  This
 will also regenerate the *initramfs* to integrate the Btrfs tools in order to
 mount the root partition during boot as it is present in a subvolume. If you
 forget this step, your system will be unbootable. This is the main
-inconvenience of having the root of the system separated for the root of the
+inconvenience of having the root of the system separated from the root of the
 Btrfs partition. The kernel alone is not able to handle such setup, so you need
 an initramfs with the `btrfs` program to mount your partitions.
 
@@ -324,9 +324,9 @@ root@debian# apt-get install grub2
 ```
 
 When you are asked to select the disk where to install grub, be careful not to
-select partionless disks. If you created partitions in all your disks, I
+select a partionless disks. If you created partitions in all your disks, I
 recommend you to install grub on all the disks, as you will still be able to
-boot even if you loose one disk.
+boot even if you lose one disk.
 
 Once you are done, you can directly go to the *Finish the installation* step.
 This will reboot your system, and you can now start using it.
@@ -335,26 +335,25 @@ This will reboot your system, and you can now start using it.
 
 ## Auto shutdown script
 
-I wanted to share a script I wrote to automatically shut down your server when
-it isn't used. You can access this script directly on my [GitHub
-repository][github].
+Here is a script I wrote to automatically shut down your server when it isn't
+used. You can access this script directly on my [GitHub repository][github].
 
 It can run in a crontab or as a daemon, regularly running different tests to
 check if the server is in use. After some amount of time without any activity,
-it will shut down the system. You can create a configuration files to override
+it will shut down the system. You can create a configuration file to override
 some settings. The tests include checking for connected users and established
 network connections. I encourage you to read the code and modify the script,
 and don't hesitate to send feedback.
 
 ## Final thoughts
 
-This setup might seem complicated, but it has a lot of advantages as we will
-see in another articles. Among them, you can easily install another Linux
+This setup might seem complicated, but it has a lot of advantages as you will
+see in other articles. Especially, you can easily install another Linux
 distribution while the current system is running without using an installation
 drive. You can also import the system on your desktop machine, test some
 changes and send them back to your server. Then, when you are ready, you can
 seamlessly switch to the new system. Finally, you can have an unlimited number
-of online snapshots without worrying about space or performance issuek
+of online snapshots without worrying about space or performance issues.
 
 [prev_post]:   {% post_url 2015-11-11-building-a-cheap-nas %}
 [Kodi]:        https://kodi.tv/
