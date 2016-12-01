@@ -99,8 +99,8 @@ We will assume that `/dev/sda` is the 2TB disk. To check that, you can run
 destroy all your data. In my case, I only had empty disks and the installation
 media so I didn't have to worry.
 
-``` shell_session
-# fdisk /dev/sda
+```bash
+$ fdisk /dev/sda
 
 Welcome to fdisk (util-linux 2.25.2).
 Changes will remain in memory only, until you decide to write them.
@@ -109,7 +109,7 @@ Be careful before using the write command.
 
 Create the swap partition. I will use 1GB for this tutorial.
 
-``` shell_session
+```bash
 Command (m for help): n
 Partition type
    p   primary (0 primary, 0 extended, 4 free)
@@ -132,7 +132,7 @@ create a separated boot partition depending on the bootloader you want to use.
 If you plan on using `grub2` and don't encrypt your hard drive you don't need
 it.
 
-``` shell_session
+```bash
 Command (m for help): n
 Partition type
 p   primary (1 primary, 0 extended, 3 free)
@@ -163,8 +163,8 @@ disks to install the bootload to the MBR.
 
 You can then create the swap with the following command:
 
-``` shell_session
-# mkswap /dev/sda1
+```bash
+$ mkswap /dev/sda1
 Setting up swapspace version 1, size = 1073737728 bytes
 UUID=fc6d3f5d-8e2a-4ce3-8d3d-ba13c08a617e
 ```
@@ -176,9 +176,9 @@ different partitions you want to use to create the Btrfs volume. In my case,
 this would be `/dev/sda`, `/dev/sdb` and `/dev/sdc`. It might be something else
 depending on your setup. You can then run the following commands.
 
-``` shell_session
-# modprobe btrfs
-# mkfs.btrfs -L nas -m raid1 -d raid1 /dev/sda2 /dev/sdb /dev/sdc
+```bash
+$ modprobe btrfs
+$ mkfs.btrfs -L nas -m raid1 -d raid1 /dev/sda2 /dev/sdb /dev/sdc
 Btrfs v3.17
 See http://btrfs.wiki.kernel.org for more information.
 
@@ -196,14 +196,14 @@ heterogeneous disks.
 
 Then, you need to mount the newly created Btrfs volume.
 
-``` shell_session
-# mount /dev/sda2 /mnt
+```bash
+$ mount /dev/sda2 /mnt
 ```
 
 Check that every data are mirrored by running:
 
-``` shell_session
-# btrfs filesystem df /mnt/
+```bash
+$ btrfs filesystem df /mnt/
 Data, RAID1: total=1.00GiB, used=512.00KiB
 Data, single: total=8.00MiB, used=0.00B
 System, RAID1: total=8.00MiB, used=16.00KiB
@@ -218,8 +218,8 @@ the data are written to at least 2 different disks in order to tolerate the
 loss of 1 disk. If you see *single* like on my output, just run the following
 command.
 
-``` shell_session
-# btrfs balance /mnt/
+```bash
+$ btrfs balance /mnt/
 Done, had to relocate 6 out of 6 chunks
 ```
 
@@ -228,14 +228,14 @@ root than the Btrfs tree root. This has several advantages, like being able to
 easily install a new OS on the same volume or snapshots of your volumes. I will
 dedicate another article to by backup setup.
 
-``` shell_session
-# btrfs subvolume create /mnt/debian/
+```bash
+$ btrfs subvolume create /mnt/debian/
 Create subvolume '/mnt/debian'
-# btrfs subvolume create /mnt/debian/root/
+$ btrfs subvolume create /mnt/debian/root/
 Create subvolume '/mnt/debian/root'
-# btrfs subvolume create /mnt/debian/var
+$ btrfs subvolume create /mnt/debian/var
 Create subvolume '/mnt/debian/var'
-# btrfs subvolume create /mnt/debian/home
+$ btrfs subvolume create /mnt/debian/home
 Create subvolume '/mnt/debian/home'
 ```
 
@@ -243,13 +243,13 @@ Finally, mount the different subvolumes such that Debian can install the base
 system. You may want to have a look at the [Btrfs mount options][btrfs_mount] in case for
 instance you use SSD or you want to enable compression.
 
-``` shell_session
-# mkdir /target
-# mount -o subvol=debian/root /dev/sda2 /target
-# mkdir /target/var
-# mount -o subvol=debian/var /dev/sda2 /target/var
-# mkdir /target/home
-# mount -o subvol=debian/home /dev/sda2 /target/home
+```bash
+$ mkdir /target
+$ mount -o subvol=debian/root /dev/sda2 /target
+$ mkdir /target/var
+$ mount -o subvol=debian/var /dev/sda2 /target/var
+$ mkdir /target/home
+$ mount -o subvol=debian/home /dev/sda2 /target/home
 ```
 
 You also need to manually create the fstab file in */target/etc/fstab/*. Here
@@ -301,8 +301,8 @@ Unfortunately, because of the manual partitioning, you will have to manually
 install some programs. First, you need to *chroot* into the new system. You can
 do that with the following command:
 
-``` shell_session
-# chroot /target /bin/bash
+```bash
+$ chroot /target /bin/bash
 ```
 
 Then, you can install the Btrfs tools containing the `btrfs` command.  This
@@ -313,13 +313,13 @@ inconvenience of having the root of the system separated from the root of the
 Btrfs partition. The kernel alone is not able to handle such setup, so you need
 an initramfs with the `btrfs` program to mount your partitions.
 
-``` shell_session
+```bash
 root@debian# apt-get install btrfs-tools
 ```
 
 Finally, you can install and configure grub:
 
-``` shell_session
+```bash
 root@debian# apt-get install grub2
 ```
 
