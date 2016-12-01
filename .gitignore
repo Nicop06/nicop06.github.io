@@ -1,4 +1,6 @@
 _site
 _cache
 dist
+stack.yaml
 .sass-cache
+.stack-work
