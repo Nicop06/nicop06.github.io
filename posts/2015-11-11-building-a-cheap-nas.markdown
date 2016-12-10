@@ -1,7 +1,5 @@
 ---
-layout: post
 title:  "How to build a NAS for 300€"
-date:   2015-11-11
 tags:   hardware
 ---
 

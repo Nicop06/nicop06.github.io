@@ -1,7 +1,5 @@
 ---
-layout: post
 title:  "How to setup a NAS using Btrfs"
-date:   2015-12-19
 tags:   Linux Btrfs
 ---
 
