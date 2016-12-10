@@ -3,10 +3,11 @@ title:  "How to setup a NAS using Btrfs"
 tags:   Linux Btrfs
 ---
 
-This post will show you how to setup of the NAS built in [the previous post][].
-The NAS would have two purposes. The first one would be to provide a reliable
-and easily accessible storage to share media files and do backups. The second
-one would be to serve as a media center, using [Kodi][] for instance.
+This post will show you how to setup of the NAS built in [the previous
+post][prev_post].  The NAS would have two purposes. The first one would be to
+provide a reliable and easily accessible storage to share media files and do
+backups. The second one would be to serve as a media center, using [Kodi][] for
+instance.
 
 ## Choosing the OS
 
@@ -353,7 +354,7 @@ changes and send them back to your server. Then, when you are ready, you can
 seamlessly switch to the new system. Finally, you can have an unlimited number
 of online snapshots without worrying about space or performance issues.
 
-[prev_post]:   {% post_url 2015-11-11-building-a-cheap-nas %}
+[prev_post]:   2015-11-11-building-a-cheap-nas.html
 [Kodi]:        https://kodi.tv/
 [Btrfs]:       https://btrfs.wiki.kernel.org/index.php/Main_Page
 [OpenRC]:      https://wiki.gentoo.org/wiki/OpenRC
