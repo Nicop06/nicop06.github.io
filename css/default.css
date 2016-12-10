@@ -1,21 +1,24 @@
 body {
+    font-family: "Open Sans", sans-serif;
     background-color: #dedede;
     font-size: 16px;
     margin: 0px auto;
-    width: 740px;
+    max-width: 740px;
+    width: 95%;
 }
 
 div#header {
-    border-bottom: 2px solid black;
-    margin-bottom: 30px;
-    padding: 12px 0px;
+    background-color: white;
+    border-radius: 10px;
+    border: 2px solid #97afcc;
+    margin: 15px 0px;
+    padding: 30px 20px;
 }
 
 div#content {
-    background-color: #fefefe;
+    background-color: white;
     border-radius: 10px;
     border: 2px solid #97afcc;
-    font-family: "Open Sans",Helvetica;
     font-size: 16px;
     padding: 10px 20px;
 }
@@ -28,6 +31,10 @@ div#logo a {
     text-decoration: none;
 }
 
+div#logo a:hover {
+  text-decoration: underline;
+}
+
 div#header #navigation {
     text-align: right;
 }
@@ -36,18 +43,31 @@ div#header #navigation a {
     color: black;
     font-size: 18px;
     font-weight: bold;
-    margin-left: 12px;
+    margin-left: 6px;
+    padding: 20px 8px;
     text-decoration: none;
     text-transform: uppercase;
 }
 
+div#header #navigation a:hover {
+  text-decoration: underline;
+}
+
+@media screen and (min-width: 600px) {
+  div#header #navigation a:hover {
+    color: white;
+    background-color: black;
+    border-radius: 10px;
+    text-decoration: none;
+  }
+}
+
 div#footer {
-    border-top: 2px solid black;
     color: #555555;
     font-size: 12px;
-    margin-top: 30px;
+    margin-top: 10px;
     padding: 12px 0px;
-    text-align: right;
+    text-align: center;
 }
 
 h1 {
@@ -83,4 +103,8 @@ a:hover {
     color: #4592d2;
     text-decoration: underline;
     text-width: 4;
+}
+
+img {
+  max-width: 100%;
 }

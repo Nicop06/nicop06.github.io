@@ -21,7 +21,8 @@ offers "wake on lan" from full shutdown, which was great as I didn't need it to
 be constantly running. I was quite happy with this setup, but I was waiting for
 something to go wrong to upgrade to newer hardware.
 
-![Optilex GX270](http://ecx.images-amazon.com/images/I/41CK1kOQBbL.jpg)
+![Optilex GX270](http://ecx.images-amazon.com/images/I/41CK1kOQBbL.jpg)\
+
 
 ## The new setup
 
@@ -33,7 +34,7 @@ that could fit under my TV stand and that could host at least 2 and ideally 4
 ### The case
 
 ![Cooler Master Elite
-110](http://assets.coolermaster.com/global/uploadfile/fileproduct_list/P1310080001d512/PRDPIC/290_10_df8f1c7669ef8521288b5bbeeb58be77_1381951732.jpg)
+110](http://assets.coolermaster.com/global/uploadfile/fileproduct_list/P1310080001d512/PRDPIC/290_10_df8f1c7669ef8521288b5bbeeb58be77_1381951732.jpg)\
 
 The first piece I chose was the case. I picked the [Cooler Master Elite
 110](http://www.coolermaster.com/case/mini-itx-elite-series/elite110/) as it
@@ -46,7 +47,7 @@ hot swappable bays.
 ### The Motherboard and CPU
 
 ![ASRock
-Q1900-ITX](http://resources.mini-box.com/online/MBD-ASRock-Q1900-ITX/moreimages/MBD-ASRock-Q1900-ITX-b1.jpg)
+Q1900-ITX](http://resources.mini-box.com/online/MBD-ASRock-Q1900-ITX/moreimages/MBD-ASRock-Q1900-ITX-b1.jpg)\
 
 I didn't need huge amount of power, so I chose a motherboard with an integrated
 CPU and a graphical circuit. ASRock ITX motherboard exactly fit my need, and
@@ -84,7 +85,7 @@ the motherboard.
 
 ### The power supply
 
-![FSP 350W](http://www.fsp-group.com.tw/upload/2013/06/11/1370945109.jpg)
+![FSP 350W](http://www.fsp-group.com.tw/upload/2013/06/11/1370945109.jpg)\
 
 As for the power supply, I bought a [FSP 350W
 80PLUS](http://www.fsp-group.com.tw/index.php?do=proinfo&id=144). It is a bit
@@ -98,7 +99,7 @@ adapter](http://www.amazon.com/StarTech-com-12-Inch-Power-Cable-Adapter/dp/B0002
 ### Storage
 
 ![WD Green
-2TB](http://www.wdc.com/global/images/products/models/img5/300/wdfDesktop_Green_SATA64_6GBS.jpg)
+2TB](http://www.wdc.com/global/images/products/models/img5/300/wdfDesktop_Green_SATA64_6GBS.jpg)\
 
 I only bought one [WD Green
 2TB](http://www.amazon.com/Green-2TB-Desktop-Hard-Drive/dp/B008YAHW6I/ref=sr_1_1?ie=UTF8&qid=1447262513&sr=8-1&keywords=wd+green+2tb)
@@ -116,7 +117,7 @@ find for 50€.
 
 ## Assembling the NAS
 
-![NAS Inside](/assets/nas_inside.jpg)
+![NAS Inside](/images/nas_inside.jpg)\
 
 The next step was to assemble everything. This was pretty straightforward, and
 the case provided enough screws for the 3 HDDs, the motherboard and the power
@@ -131,11 +132,11 @@ plugged my right-angled cable on the SATA2 port. But if you buy cables for this
 case, I highly recommend buying [left-angled
 cables](http://www.amazon.com/StarTech-com-SATA12LA1-12-Inch-Angle-Serial/dp/B004KDTTXW/ref=sr_1_1?ie=UTF8&qid=1447518102&sr=8-1&keywords=left+angled+sata+cable).
 
-![NAS Inside](/assets/nas_with_power_supply.jpg)
+![NAS Inside](/images/nas_with_power_supply.jpg)\
 
 Then, I added the power supply.
 
-![NAS Inside](/assets/nas_with_HDD.jpg)
+![NAS Inside](/images/nas_with_HDD.jpg)\
 
 And finally, I added the 3 drives. The last one is on the opposite side of the
 picture.

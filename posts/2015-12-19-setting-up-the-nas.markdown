@@ -72,7 +72,7 @@ the instructions until you reach the _Load installer components from CD_ part.
 You might want to select `cfdisk` or `gparted` to manually create your disk
 layout if you are used to them. In this post, we will directly use `fdisk`.
 
-![Debian load installer components](/assets/debian-load-installer-components.png)
+![Debian load installer components](/images/debian-load-installer-components.png)\
 
 Continue until you reach the _Partition disks_ part. At this point, you will
 need to stop the installation process and go to the second terminal by entering
@@ -273,7 +273,7 @@ partitioning step and run directly the *install the base system* step. Don't
 worry if you get the following message, you can ignore it by selecting `<Go
 Back>`. You might need to do that more than once.
 
-![Debian error partitioning](/assets/debian-error-partitioning.png)
+![Debian error partitioning](/images/debian-error-partitioning.png)\
 
 The installation step may take a while depending on the disks you are using or
 your network speed. While this is installing, you can go to */mnt/debian/root*
