@@ -1,6 +1,6 @@
 ---
 title:  "How to setup a NAS using Btrfs"
-tags:   linux btrfs NAS
+tags:   NAS, linux, btrfs
 ---
 
 This post will show you how to setup of the NAS built in [the previous

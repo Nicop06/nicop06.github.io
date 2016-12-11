@@ -1,6 +1,6 @@
 ---
 title:  "Which OS to run a NAS"
-tags:   linux NAS
+tags:   NAS, linux
 ---
 
 Before setting up the NAS, I had to decide which OS I would use to run it. This

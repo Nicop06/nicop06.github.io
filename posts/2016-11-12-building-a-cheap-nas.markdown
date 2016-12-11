@@ -1,6 +1,6 @@
 ---
 title:  "How to build a NAS for 300€"
-tags:   hardware NAS
+tags:   NAS, hardware
 ---
 
 This post describes the story of how I built a new NAS and media center from
