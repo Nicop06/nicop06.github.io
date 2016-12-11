@@ -90,8 +90,16 @@ pre {
     padding: 5px;
 }
 
+pre > code {
+    background-color: inherit;
+    padding: 0;
+}
+
 code {
     white-space: pre-wrap;
+    background-color: #dedede;
+    color: black;
+    padding: 0 3px;
 }
 
 a {
