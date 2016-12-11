@@ -1,6 +1,6 @@
 ---
 title:  "How to build a NAS for 300€"
-tags:   hardware
+tags:   hardware NAS
 ---
 
 This post describes the story of how I built a new NAS and media center from
@@ -134,9 +134,10 @@ find the required options. And now, we are ready to setup the system.
 
 With this setup, you now have a NAS for just over 300€, with possibility to
 upgrade and 2To of hard drive. The configuration is powerful enough and compact
-enough to be used as a media center. In the next post, I will discuss the
-software setup.
+enough to be used as a media center. [In the next post][next_post], I will
+discuss the software setup.
 
+[next_post]:               2016-12-10-setting-up-the-nas.markdown
 [FreeBSD]:                 https://www.freebsd.org/
 [Optilex GX270]:           http://www.amazon.co.uk/Dell-Optiplex-GX270-Professional-pre-installed/dp/B001UU3UMO
 [ASRock Q1900-ITX]:        http://www.asrock.com/mb/Intel/Q1900-ITX/

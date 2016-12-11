@@ -1,13 +1,14 @@
 ---
 title:  "How to setup a NAS using Btrfs"
-tags:   linux btrfs
+tags:   linux btrfs NAS
 ---
 
 This post will show you how to setup of the NAS built in [the previous
 post][prev_post]. The NAS would have two purposes. The first one would be to
 provide a reliable and easily accessible storage to share media files and do
-backups. The second one would be to serve as a media center, using [Kodi][] for
-instance.
+backups. The second one would be to serve as a media center, using
+[Kodi][] for instance. We will use [Btrfs][] as this is a modern
+filesystem with a lot of interesting features.
 
 ## Before you start
 
@@ -19,17 +20,12 @@ a lot of simpler ways to build a NAS, at the cost of flexibility.
 The best way to understand how Linux installation works is to perform manual
 installation. There are many distributions providing great guide for
 installing from scratch. For instance, you could try [ArchLinux][] or
-[Gentoo][].
+[Gentoo][] installation guide.
 
 In this article, we will use [Debian][] and perform a guided installation
 with some manual steps. You can also install Debian manually using
-[Debootstrap][], but this is not the goal of this article. You could for
-instance follow [this page][debinst] from the official Debian installation
-guide. You can also read [this article][btrfs_arch] describing a similar
-setup with ArchLinux.
-
-Finally, if you are interesting on other OS I considered for the NAS, you
-could read [this article][other_OS].
+[Debootstrap][] by following [this page][debinst] from the official Debian
+installation guide.
 
 ## Starting the installation
 
@@ -49,10 +45,10 @@ _CTRL+ALT+F2_. You will then need to perform some manual setup.
 ## Drives setup
 
 The purpose of the server is to provide accessible and reliable storage for the
-whole network, so this is the most important part of the setup. In this setup,
-I have two 1TB disks and one 2TB disk. Even if it is recommended to have disks
-of the same size, it is possible to use all the disks in an efficient way and
-have redundancy.
+whole network, so this is the most important part of the setup. My NAS has two
+1TB disks and one 2TB disk, and I will create a 2TB redundant storage. Even if
+it is recommended to have disks of the same size, it is possible to use all the
+disks in an efficient way and have redundancy.
 
 ### Partitioning
 
@@ -65,8 +61,7 @@ disk for instance, unless you don't mind wasting a few GB.
 We will assume that `/dev/sda` is the 2TB disk. To check that, you can run
 `dmesg | grep '2.00 TB'`. If you have any disk containing important data,
 I would recommend unpluging them or doing some backup before going any
-further. In my case, I only had empty disks and the installation media so
-I didn't have to worry.
+further. In my case, I only had empty disks and the installation media.
 
 ```
 # fdisk /dev/sda
@@ -76,9 +71,9 @@ Changes will remain in memory only, until you decide to write them.
 Be careful before using the write command.
 ```
 
-Create the swap partition. I will use 1GB for this tutorial. The code
-snapshots are taken from a VM on which I ran the procedure, that's why the
-size don't match the disks I have on the NAS.
+Create the swap partition. I will use 1GB for this tutorial. The snapshots
+below are taken from a VM on which I ran the procedure, that's why the size
+don't match the disks I have on the NAS.
 
 ```
 Command (m for help): n
@@ -158,10 +153,10 @@ fs created label nas on /dev/sda2
         nodesize 16384 leafsize 16384 sectorsize 4096 size 15.00GiB
 ```
 
-The `-L nas` creates a label on the filesystem so that you can mount it using
-the label instead of the UUID. The `-m raid1` and `-d raid1` activate raid1 for
-the metadata and the data. Btrfs will automatically handle the poll of
-heterogeneous disks.
+The `-L nas` creates a label on the filesystem so that you can mount it
+using the label instead of the UUID. The `-m raid1` and `-d raid1`
+activate [RAID 1][] for the metadata and the data. Btrfs will automatically
+handle the poll of heterogeneous disks.
 
 Then, you need to mount the newly created Btrfs volume.
 
@@ -182,7 +177,7 @@ Metadata, single: total=8.00MiB, used=0.00B
 GlobalReserve, single: total=16.00MiB, used=0.00B
 ```
 
-You need all the blocks to use the [RAID1][] allocation level. This
+You need all the blocks to use the [RAID 1][] allocation level. This
 ensures that the data are written to at least 2 different disks in order
 to tolerate the loss of 1 disk. If you see *single* like on my output,
 just run the following command.
@@ -194,7 +189,7 @@ Done, had to relocate 6 out of 6 chunks
 
 Now, let's create the subvolumes. For the root partition, I use a different
 root than the Btrfs tree root. This has several advantages, like being able to
-easily install a new OS on the same volume or snapshots of your volumes. I will
+easily install a new OS on the same volume or snapshots my volumes. I will
 dedicate another article to my backup setup.
 
 ```
@@ -295,23 +290,11 @@ root@debian# apt-get install grub2
 
 When you are asked to select the disk where to install grub, be careful not to
 select a partionless disks. If you created partitions in all your disks,
-I recommend you to install grub on all of them. Doing so, losing one disk
-will not make your system unbootable.
+I recommend you to install grub on all of them. Doing so, you will still
+be able to boot your system if your main disk fails.
 
 Once you are done, you can directly go to the *Finish the installation* step.
 This will reboot your system, and you can now start using it.
-
-## Auto shutdown script
-
-Here is a script I wrote to automatically shut down your server when it isn't
-used. You can access this script directly on my [GitHub repository][github].
-
-It can run in a crontab or as a daemon, regularly testing if the server is
-in use. After a configurable amount of time without any activity, it will
-shut down the system. You can create a configuration file to override some
-settings. The tests include checking for connected users and established
-network connections. I encourage you to read the code and modify the
-script, and don't hesitate to send feedback.
 
 ## Final thoughts
 
@@ -324,17 +307,25 @@ you are ready, you can seamlessly switch to the new system. Finally, you
 can have an unlimited number of online snapshots without worrying about
 space or performance issues.
 
+## Further readings
+
+* This setup is inspired from [this article][btrfs_arch] describing a similar
+  setup with ArchLinux.
+* [This other post][other_OS] will compare several OS I considered or
+  tried for my NAS.
+
 [prev_post]:   2015-11-11-building-a-cheap-nas.html
-[other_OS]:    2015-11-11-building-a-cheap-nas.html
+[other_OS]:    2016-12-03-choosing-the-OS.markdown
 [btrfs_arch]:  https://ramsdenj.com/2016/04/05/using-btrfs-for-easy-backup-and-rollback.html
 [Kodi]:        https://kodi.tv/
+[Btrfs]:       https://btrfs.wiki.kernel.org/index.php/Main_Page
 [Archlinux]:   https://wiki.archlinux.org/index.php/installation_guide
 [Gentoo]:      https://wiki.gentoo.org/wiki/Handbook:AMD64
 [Debian]:      https://www.debian.org/
 [Debootstrap]: https://wiki.debian.org/Debootstrap
 [debinst]:     https://www.debian.org/releases/stable/amd64/apds03.html.en
 [netinst]:     https://www.debian.org/CD/netinst/
-[RAID1]:       https://en.wikipedia.org/wiki/Standard_RAID_levels#RAID_1
+[RAID 1]:      https://en.wikipedia.org/wiki/Standard_RAID_levels#RAID_1
 [btrfs_mount]: https://btrfs.wiki.kernel.org/index.php/Mount_options
 [syslinux]:    http://www.syslinux.org/wiki/index.php?title=Filesystem#Btrfs
 [github]:      https://github.com/Nicop06/dotfiles/blob/master/bin/auto-shutdown.sh
