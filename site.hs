@@ -6,8 +6,8 @@ import           Hakyll
 
 --------------------------------------------------------------------------------
 main :: IO ()
-main = hakyll $ do
-    match ("images/*" .||. "files/*") $ do
+main = hakyllWith conf $ do
+    match ("images/*" .||. "files/*" .||. "CNAME") $ do
         route   idRoute
         compile copyFileCompiler
 
@@ -75,6 +75,9 @@ main = hakyll $ do
                 >>= relativizeUrls
 
     match "templates/*" $ compile templateBodyCompiler
+
+  where
+    conf = defaultConfiguration { deployCommand = "./deploy.sh" }
 
 
 --------------------------------------------------------------------------------
