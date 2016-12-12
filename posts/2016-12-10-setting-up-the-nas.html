@@ -154,7 +154,7 @@ The installation step may take a while depending on the disks you are using or y
 <pre><code>root@debian# apt-get install btrfs-tools</code></pre>
 <p>Finally, you can install and configure grub:</p>
 <pre><code>root@debian# apt-get install grub2</code></pre>
-<p>When you are asked to select the disk where to install grub, be careful not to select a partionless disks. If you created partitions in all your disks, I recommend you to install grub on all of them. Doing so, you will still be able to boot your system if your main disk fails.</p>
+<p>When you are asked to select the disk where to install grub, be careful not to select a partionless disks. If you created partitions in all your disks, I recommend you to install grub on all of them. Doing so, you will still be able to boot your system even if your main disk fails.</p>
 <p>Once you are done, you can directly go to the <em>Finish the installation</em> step. This will reboot your system, and you can now start using it.</p>
 <h2 id="final-thoughts">Final thoughts</h2>
 <p>This setup might seem complicated, but it has a lot of advantages as you will see in later articles. Especially, you can easily install another Linux distribution while the current system is running without using an installation drive. You can also import the system on your desktop machine, test some changes and send them back to your server. Then, when you are ready, you can seamlessly switch to the new system. Finally, you can have an unlimited number of online snapshots without worrying about space or performance issues.</p>
