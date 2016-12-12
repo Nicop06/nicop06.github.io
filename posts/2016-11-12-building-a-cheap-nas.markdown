@@ -137,7 +137,7 @@ upgrade and 2To of hard drive. The configuration is powerful enough and compact
 enough to be used as a media center. [In the next post][next_post], I will
 discuss the software setup.
 
-[next_post]:               2016-12-10-setting-up-the-nas.markdown
+[next_post]:               2016-12-10-setting-up-the-nas.html
 [FreeBSD]:                 https://www.freebsd.org/
 [Optilex GX270]:           http://www.amazon.co.uk/Dell-Optiplex-GX270-Professional-pre-installed/dp/B001UU3UMO
 [ASRock Q1900-ITX]:        http://www.asrock.com/mb/Intel/Q1900-ITX/

@@ -61,7 +61,7 @@ definitive. I actually installed 3 of the OS discussed in this article before
 settling for ArchLinux. Also, I plan on migrating to Alpine, mainly because it
 [doesn't use systemd][wo-systemd].
 
-[next_post]:   2016-12-10-setting-up-the-nas.markdown
+[next_post]:   2016-12-10-setting-up-the-nas.html
 [Btrfs]:       https://btrfs.wiki.kernel.org/index.php/Main_Page
 [OpenRC]:      https://wiki.gentoo.org/wiki/OpenRC
 [systemd]:     https://www.freedesktop.org/wiki/Software/systemd/
@@ -72,4 +72,4 @@ settling for ArchLinux. Also, I plan on migrating to Alpine, mainly because it
 [Debian]:      https://www.debian.org/
 [ArchLinux]:   https://www.archlinux.org/
 [Gentoo]:      https://www.gentoo.org/
-[Alpine]:      https://www.alpine.org/
+[Alpine]:      https://alpinelinux.org/

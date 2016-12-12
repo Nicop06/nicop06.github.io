@@ -314,8 +314,8 @@ space or performance issues.
 * [This other post][other_OS] will compare several OS I considered or
   tried for my NAS.
 
-[build_nas]:   2016-11-16-building-a-cheap-nas.html
-[other_OS]:    2016-12-03-choosing-the-OS.markdown
+[build_nas]:   2016-11-12-building-a-cheap-nas.html
+[other_OS]:    2016-12-03-choosing-the-OS.html
 [btrfs_arch]:  https://ramsdenj.com/2016/04/05/using-btrfs-for-easy-backup-and-rollback.html
 [Kodi]:        https://kodi.tv/
 [Btrfs]:       https://btrfs.wiki.kernel.org/index.php/Main_Page
