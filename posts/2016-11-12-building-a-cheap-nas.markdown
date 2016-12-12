@@ -42,8 +42,8 @@ expect hot swappable bays.
 ![ASRock Q1900-ITX](/images/ASRock_Q1900-ITX.jpg)\
 
 I didn't need huge amount of power, so I chose a motherboard with an integrated
-CPU and a graphical circuit. ASRock ITX motherboard exactly fit my need, and
-cost only 80€ with the integrated CPU. This is the subsidiary brand of Asus,
+CPU and a graphical circuit. ASRock ITX motherboard exactly fits my need, and
+costs only 80€ with the integrated CPU. This is the subsidiary brand of Asus,
 created to sell their low cost products without impacting their reputation. I
 preferred an Intel CPU for their great Linux support, although the AMD APU are
 usually good choice for such use as their integrated GPU is much more powerful.

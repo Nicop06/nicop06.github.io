@@ -291,7 +291,7 @@ root@debian# apt-get install grub2
 When you are asked to select the disk where to install grub, be careful not to
 select a partionless disks. If you created partitions in all your disks,
 I recommend you to install grub on all of them. Doing so, you will still
-be able to boot your system if your main disk fails.
+be able to boot your system even if your main disk fails.
 
 Once you are done, you can directly go to the *Finish the installation* step.
 This will reboot your system, and you can now start using it.
