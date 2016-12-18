@@ -313,6 +313,9 @@ space or performance issues.
   setup with ArchLinux.
 * [This other post][other_OS] will compare several OS I considered or
   tried for my NAS.
+* You can use [this script][autoshutdown] if you want to shutdown your server
+  when it is not in use. Feel free to give feedback or contribute if you want
+  to add feature.
 
 [build_nas]:   2016-11-12-building-a-cheap-nas.html
 [other_OS]:    2016-12-03-choosing-the-OS.html
@@ -328,4 +331,4 @@ space or performance issues.
 [RAID 1]:      https://en.wikipedia.org/wiki/Standard_RAID_levels#RAID_1
 [btrfs_mount]: https://btrfs.wiki.kernel.org/index.php/Mount_options
 [syslinux]:    http://www.syslinux.org/wiki/index.php?title=Filesystem#Btrfs
-[github]:      https://github.com/Nicop06/dotfiles/blob/master/bin/auto-shutdown.sh
+[autoshutdown]:https://github.com/Nicop06/dotfiles/blob/master/bin/auto-shutdown.sh
