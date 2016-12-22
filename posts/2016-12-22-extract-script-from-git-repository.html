@@ -33,40 +33,46 @@
   
 </div>
 
-<p>A few days ago, I needed to extract a script from a git repository maintained by another team and import it in our newly created repository. This would allow us to implement our own continuous integration pipeline.</p>
+<p>A few days ago, I needed to extract a script from a git repository maintained by another team and import it into my own repository.</p>
 <h2 id="naive-approach">Naive approach</h2>
 <p>The first thing I did was to copy paste the script in a new repository and start from here. However, I later realized that I also wanted to keep the changesets of the script from the old repository. To complicate things, the script was also modified in the new one.</p>
 <p>For the purpose of this post, let’s call <code>myscript</code> the script I want to import, <code>myrepo</code> the new repository I created to hold this script and <code>oldrepo</code> the repository where it was previously maintained.</p>
-<h2 id="extracting-the-history"> Extracting the history</h2>
-<p>The first step was to extract the history in the old repository that concerned my script. To do so, I first created a branch to be sure I would lose all my data, although I could always clone the repository later.</p>
+<h2 id="extracting-the-history">Extracting the history</h2>
+<p>The first step was to extract the changesets in the old repository that modified my script. To do so, I first created a new branch to work on.</p>
 <div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash">$ <span class="bu">cd</span> /path/to/oldrepo
 $ <span class="fu">git</span> checkout -b export_myscript</code></pre></div>
-<p>Then, I used <code>filter-branch</code> command from <code>git</code> to only extract the part that concerned my script.</p>
-<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash">$ <span class="fu">git</span> filter-branch --prune-empty --tree-filter <span class="st">'find -not -name myscript -delete'</span></code></pre></div>
-<p>Basically, this will run through each commit of the current branch and execute the command. The <code>find</code> command we execute will delete any file whose name is not <code>myscript</code>. Then, thanks to the <code>--prune-empty</code> option, it will remove the empty commits, which are basically the ones not concerning <code>myscript</code>.</p>
-<p>This has the same result as checking out all commits one by one, execute the command you provided and perform a <code>git commit --amend</code>. However, this is much faster and much more powerful.</p>
-<p>You can always rollback your changes by doing <code>git reset --hard master</code> if your parent branch was <code>master</code>. Also, the current branch is backed up under the name <code>refs/original/refs/heads/YOUR_BRANCH</code>. So in this case you could do:</p>
+<p>Then, I used <code>filter-branch</code> command from git to only extract the commits I was interested in.</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash">$ <span class="fu">git</span> filter-branch --prune-empty --tree-filter \
+  <span class="st">'find -not -name myscript -delete'</span></code></pre></div>
+<p>Basically, the <code>filter-branch</code> command will loop over every commit of the current branch and execute the command provided. The <code>find</code> command I used will delete all the files whose name is not <code>myscript</code>. Then, thanks to the <code>--prune-empty</code> option, it will remove the empty commits, which are basically the ones that don’t alter <code>myscript</code>.</p>
+<p>This has the same result as if you manually checkout all the commits one by one, execute the command and perform a <code>git commit --amend</code>. However, this is much faster and much more powerful.</p>
+<p>You can always rollback your changes by doing <code>git reset --hard master</code> if your parent branch is <code>master</code>. Also, the current branch is backed up under the name <code>refs/original/refs/heads/YOUR_BRANCH</code>. So in this case you could do:</p>
 <div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash">$ <span class="fu">git</span> reset --hard refs/original/refs/heads/export_myscript</code></pre></div>
 <h2 id="removing-submodules">Removing submodules</h2>
-<p>To make things a little more fun, the repository contained a submodule. First, we had to unregister the submodule with the following command.</p>
+<p>To add a little more fun, the repository contained a submodule. In that case, you first need to unregister the submodule with the following command.</p>
 <div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash">$ <span class="fu">git</span> submodule deinit mysubmodule</code></pre></div>
-<p>Then, we had to remove the submodule folder from all the commits. Because this is not a regular file, it needs to be removed with the <code>git rm</code> command.</p>
+<p>Then, you can remove the submodule folder from all the commits. Because a submodule is not a regular file, it needs to be removed with the <code>git rm</code> command.</p>
 <div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash">$ <span class="fu">git</span> filter-branch -f --prune-empty --index-filter \
     <span class="st">&quot;git rm -r -f --cached --ignore-unmatch mysubmodule&quot;</span></code></pre></div>
-<p>The advantage of the <code>--index-filter</code> is that it doesn’t need to checkout the files before executing the command, making it much faster. However, we are limited to the git commands, and filtering all files except our script would be little tricky. Finally, we use the <code>-f</code> flag to remove the backup from the previous run of the <code>filter-branch</code> command.</p>
+<p>The advantage of the <code>--index-filter</code> is that it doesn’t need to checkout the files before executing the command, making it much faster. However, it is limited to the git commands, that’s why I didn’t use it before. Finally, the <code>-f</code> flag allows you to remove the backup from the previous run of the <code>filter-branch</code> command.</p>
 <h2 id="extracting-a-folder">Extracting a folder</h2>
 <p>If you need to extract a folder instead of a file, there is a very simple way to do so. You just need to run the following command:</p>
-<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash">$ <span class="fu">git</span> filter-branch --subdirectory-filter foodir -- --all</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash">$ <span class="fu">git</span> checkout extract-foodir
+$ <span class="fu">git</span> filter-branch --subdirectory-filter foodir -- --all</code></pre></div>
+<p>After this command, the <code>foodir</code> directory becomes the new root of the repository and all your commits are rewritten to reflect this change.</p>
+<p>You can also use the <code>subtree</code> command which is even more straightforward. In fact, the following command will directly create a new branch <code>extract-foodir</code> whose root is the <code>foodir</code> directory.</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash">$ <span class="fu">git</span> subtree split --prefix=foodir -b extract-foodir</code></pre></div>
+<p>The <code>subtree</code> command is much more powerful as it allows you to keep the subdirectory in the original repository and merge your changes back and forth. You can read more in the <a href="https://github.com/git/git/blob/master/contrib/subtree/git-subtree.txt">official subtree documentation</a>.</p>
 <h2 id="importing-the-history-in-the-new-repository">Importing the history in the new repository</h2>
-<p>Now, you need to import the history in our repository. To do so, we will import the old repository content in the new one.</p>
+<p>Finally, I need to import the history in our repository. To do so, I will import the old repository content in the new one.</p>
 <div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash">$ <span class="bu">cd</span> /path/to/myrepo
 $ <span class="fu">git</span> remote add oldrepo /path/to/oldrepo
 $ <span class="fu">git</span> fetch oldrepo export_myscript</code></pre></div>
-<p>Then we will reapply all the commits of our repository on top of the <code>export_myscript</code> branch we just imported. We will do that on a new branch called <code>import_myscript</code> in case we do a mistake.</p>
+<p>Then I will reapply all the commits of my repository on top of the <code>export_myscript</code> branch I just imported. I will do that on a new branch called <code>import_myscript</code>.</p>
 <div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash">$ <span class="fu">git</span> checkout -b import_myscript
 $ <span class="fu">git</span> rebase oldrepo/export_myscript</code></pre></div>
-<p>Running <code>git log --stat</code>, you can see that the commit corresponding to the copy of the script in your repository is now empty. In fact, git will recalculate all the diffs between commits and will deduce that <code>myscript</code> didn’t change.</p>
-<p>You can now reset your master branch to your <code>import_myscript</code> branch and do some cleanup.</p>
+<p>Git will recalculate all the diffs between commits. The consequence is that the commit corresponding to the copy pasting of <code>myscript</code> from <code>oldrepo</code> to <code>myrepo</code> should be empty. This can be verified with a <code>git log --stat</code>.</p>
+<p>I can now reset your master branch to your <code>import_myscript</code> branch and do some cleanup.</p>
 <div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash">$ <span class="fu">git</span> checkout master
 $ <span class="fu">git</span> reset --hard import_myscript
 $ <span class="fu">git</span> branch -d import_myscript
@@ -74,8 +80,8 @@ $ <span class="fu">git</span> remote rm oldrepo
 $ <span class="bu">cd</span> /path/to/oldrepo
 $ <span class="fu">git</span> checkout master
 $ <span class="fu">git</span> branch -D export_myscript</code></pre></div>
-<h2 id="final-thoughts"> Final thoughts</h2>
-<p>This article should give you some glimpse at the powerful things you can do with git. I recommend you to read the [Pro Git book][], especially chapter 7 if you want to discover other advanced tricks with git and chapter 10 to discover how git works internally.</p>
+<h2 id="final-thoughts">Final thoughts</h2>
+<p>This article should give you a glimpse at the power of git. If you want to learn more about git, I recommend you the <a href="https://git-scm.com/doc">Pro Git book</a>, especially chapter 7 in which you will learn some advanced tricks. Chapter 10 is also interesting as it explains how git works internally.</p>
 
 <div id="disqus_thread"></div>
 <script>
