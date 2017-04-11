@@ -1,5 +1,5 @@
 ---
-title:  "How to extract a script's history from a git repository"
+title:  "How to extract a script and its history from a git repository"
 tags:   git
 ---
 
