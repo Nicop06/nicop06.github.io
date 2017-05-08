@@ -27,4 +27,82 @@ thread][alpine_linux_why_no_one_is_using_it].
 
 # Boot in recovery in OVH
 
-You will first need to boot in recovery mode.
+You will first need to boot your VPS in recovery mode.
+
+# Install the server
+
+The VPS might be formatted in ext3. If that's the case, I would
+recommend reformatting it in ext4 as it yields better performance. To do
+that, you can use the following commands:
+
+```
+# umount /dev/sdb1
+# mkfs.ext4 /dev/sdb1
+# mount /dev/sdb1
+```
+
+```
+# wget ${mirror}/latest-stable/main/x86_64/apk-tools-static-${version}.apk
+# tar -xzf apk-tools-static-*.apk
+# ./sbin/apk.static -X ${mirror}/latest-stable/main -U --allow-untrusted --root ${chroot_dir} --initdb add alpine-base
+
+# cp /etc/resolv.conf ${chroot_dir}/etc/
+# mkdir -p ${chroot_dir}/root
+
+# mkdir -p ${chroot_dir}/etc/apk
+# echo "${mirror}/${branch}/main" > ${chroot_dir}/etc/apk/repositories
+
+# mount -t proc none ${chroot_dir}/proc
+# mount -o bind /sys ${chroot_dir}/sys
+# mount -o bind /dev ${chroot_dir}/dev
+
+# chroot ${chroot_dir} /bin/sh -l
+
+rc-update add devfs sysinit
+rc-update add dmesg sysinit
+rc-update add mdev sysinit
+rc-update add hwclock boot
+rc-update add modules boot
+rc-update add sysctl boot
+rc-update add hostname boot
+rc-update add bootmisc boot
+rc-update add syslog boot
+rc-update add mount-ro shutdown
+rc-update add killprocs shutdown
+rc-update add savecache shutdown
+
+rc-update add networking boot
+rc-update add urandom boot
+
+rc-update add acpid default
+rc-update add hwdrivers sysinit
+
+# apk update
+# setup-apkrepos
+# setup-apkcache
+# setup-hostname
+# setup-interfaces
+# setup-keymap
+# setup-timezone
+
+# setup-sshd
+# setup-ntp
+# rc-update add crond default
+
+# apk add linux-grsec syslinux
+# dd if=/usr/share/syslinux/mbr.bin of=/dev/sdb
+# extlinux -i /boot
+
+# vi /etc/update-extlinux.conf
+# update-extlinux
+
+# vi /etc/fstab
+
+# passwd
+
+# exit
+# reboot
+```
+
+[install_in_a_chroot]: https://wiki.alpinelinux.org/wiki/Installing_Alpine_Linux_in_a_chroot
+[install_to_disk]: https://wiki.alpinelinux.org/wiki/Install_to_disk
