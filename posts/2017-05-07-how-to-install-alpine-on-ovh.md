@@ -10,35 +10,41 @@ possible on their Cloud offer).
 
 # About Alpine Linux
 
-[Alpine Linux][] is a lightweight distribution using [musl libc][], a complete
-rewrite of the glibc 4 times smaller and aimed at correctness. Among other
-things, it uses [grsec][] kernel patches and [busybox][] instead of a complete
-GNU core utilities. They also completely rewrote their own package manager with
-a very simple format for creating packages similar to ArchLinux PKGBUILD.
+[Alpine Linux][] is a lightweight distribution using [musl libc][],
+a lightweight alternative to [glibc][], and [openrc][] as an alternative
+to [systemd][] maintained by Gentoo developers. It also uses [grsec][] kernel
+patches and [busybox][] instead of a complete GNU core utilities. It has its
+own package manager with a very simple format for creating packages similar to
+ArchLinux PKGBUILD.
 
-This is not for everyone as this is very basic and a lot of thinks won't work
-as expected. For instance, you won't be able to use man out of the box, and
-lspci will give you unreadable output. But you will have a working Linux box
-using under 50MB or RAM with OpensSSH and an NTP server and 300MB of disk space
-for a base installation.
+This distribution is not for everyone as this is very basic and a lot of
+things won't work as expected. For instance, you won't be able to use man
+out of the box, and lspci will give you a rather cryptic output. But you
+will have a working Linux box with a very small memory and hard drive
+footprint, so you can use more resources for your applications and less
+for the system.
 
 You can find more compelling arguments on [this reddit
-thread][alpine_linux_why_no_one_is_using_it].
+thread][reddit_alpine_linux].
 
 # Boot in recovery in OVH
 
-You will first need to boot your VPS in recovery mode.
+You will first need to boot your VPS in recovery mode. On the admin page
+of your VPS, click on reboot my VPS, and tick the *Reboot in rescue mode*
+option.
 
-# Install the server
+![Reboot in rescue mode](/images/ovh-reboot-in-rescue-mode.png)
+
+# Install the system
 
 The VPS might be formatted in ext3. If that's the case, I would
 recommend reformatting it in ext4 as it yields better performance. To do
 that, you can use the following commands:
 
 ```
-# umount /dev/sdb1
+# umount /mnt/sdb1
 # mkfs.ext4 /dev/sdb1
-# mount /dev/sdb1
+# mount /dev/sdb1 /mnt/sdb1
 ```
 
 ```
@@ -58,6 +64,23 @@ that, you can use the following commands:
 
 # chroot ${chroot_dir} /bin/sh -l
 
+# apk update
+# setup-apkrepos
+# setup-apkcache
+# setup-hostname
+# setup-interfaces
+# setup-keymap
+# setup-timezone
+
+# setup-sshd
+# setup-ntp
+
+# passwd
+```
+
+# Make the ssytem bootable
+
+```
 rc-update add devfs sysinit
 rc-update add dmesg sysinit
 rc-update add mdev sysinit
@@ -76,17 +99,6 @@ rc-update add urandom boot
 
 rc-update add acpid default
 rc-update add hwdrivers sysinit
-
-# apk update
-# setup-apkrepos
-# setup-apkcache
-# setup-hostname
-# setup-interfaces
-# setup-keymap
-# setup-timezone
-
-# setup-sshd
-# setup-ntp
 # rc-update add crond default
 
 # apk add linux-grsec syslinux
@@ -98,11 +110,17 @@ rc-update add hwdrivers sysinit
 
 # vi /etc/fstab
 
-# passwd
-
 # exit
 # reboot
 ```
 
+[Alpine Linux]:        https://alpinelinux.org/
+[glibc]:               https://www.gnu.org/software/libc/
+[openrc]:              https://wiki.gentoo.org/wiki/Project:OpenRC
+[systemd]:             https://www.freedesktop.org/wiki/Software/systemd/
+[musl libc]:           https://www.musl-libc.org/
+[grsec]:               https://grsecurity.net/
+[busybox]:             https://busybox.net/about.html
+[reddit_alpine_linux]: https://www.reddit.com/r/linux/comments/3mqqtx/alpine_linux_why_no_one_is_using_it/
 [install_in_a_chroot]: https://wiki.alpinelinux.org/wiki/Installing_Alpine_Linux_in_a_chroot
-[install_to_disk]: https://wiki.alpinelinux.org/wiki/Install_to_disk
+[install_to_disk]:     https://wiki.alpinelinux.org/wiki/Install_to_disk
