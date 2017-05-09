@@ -35,6 +35,10 @@ option.
 
 ![Reboot in rescue mode](/images/ovh-reboot-in-rescue-mode.png)
 
+This step takes a while (about 5 minutes), so grab a cup of coffee or do
+something else. Once it's finished, you will receive an email with the
+parameters to connect to your server to it via ssh.
+
 # Setup the disks
 
 The VPS might be formatted in ext3. If that's the case, I would
@@ -121,20 +125,34 @@ and timezone.
 # setup-timezone
 ```
 
-The interface setup is a bit more tricky. Make sure that you setup a static IP
-configuration as your VPS doesn't have any DHCP setup. If it's not suggested,
-here is how to get the different values for the IP and the gateway (the netmask
-being 255.255.255.255):
+The interface setup is a bit more tricky. You will need to perform a fully
+manual setup as the automatic one will not fill the right information. Here how
+your set should look like assuming your IP address, as seen in the is
+information is present on the VPS admin panel, is 12.34.56.78:
 
 ```
-# ip addr
+# cat /etc/network/interfaces 
+auto lo
+iface lo inet loopback
+
+auto eth0
+iface eth0 inet static
+  address 12.34.56.78
+  netmask 255.255.255.255
+  broadcast 12.34.56.78
+  post-up route add 12.34.56.1 dev eth0
+  post-up route add default gw 12.34.56.1
+  post-down route del default gw 12.34.56.1
+  post-down route del 12.34.56.1 dev eth0
+```
+
+The `post-up` and `post-down` options are used to setup the gateway. Please
+note that the `gateway` keyword is supported by Alpine but does not work on
+OVH, so a manual gateway setup is necessary. You should also check the actual
+value for the gateway with the following command: 
+
+```
 # ip route
-```
-
-You can then setup the interfaces:
-
-```
-# setup-interfaces
 ```
 
 Finally, you should install an ssh and ntp server. The suggested one works
