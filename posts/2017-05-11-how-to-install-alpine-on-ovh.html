@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="x-ua-compatible" content="ie=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Nicolas Porcel's Blog - How to install Alpine Linux on OVH</title>
+        <link rel="stylesheet" href="../css/default.css" />
+        <link rel="stylesheet" href="../css/syntax.css" />
+        <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
+    </head>
+    <body>
+        <div id="header">
+            <div id="logo">
+                <a href="../">Nicolas Porcel's Blog</a>
+            </div>
+            <div id="navigation">
+                <a href="../">Home</a>
+                <a href="../about.html">About</a>
+                <a href="../archive.html">Archive</a>
+            </div>
+        </div>
+
+        <div id="content">
+            <h1>How to install Alpine Linux on OVH</h1>
+            <div class="info">
+    Posted on May 11, 2017
+    
+</div>
+<div class="info">
+  
+  Tags: <a href="../tags/VPS.html">VPS</a>, <a href="../tags/linux.html">linux</a>
+  
+</div>
+
+<p>I recently migrated my <a href="https://www.ovh.co.uk/vps/vps-ssd.xml">OVH VPS</a> to <a href="https://alpinelinux.org/">Alpine Linux</a>. However, OVH doesn’t have any Alpine Linux image, so I had to perform a manual installation from the rescue CD. This post will explain what are the steps to follow to have a fully functional system. It should work with other Cloud providers with minimal tweaking.</p>
+<h2 id="about-alpine-linux">About Alpine Linux</h2>
+<p><a href="https://alpinelinux.org/">Alpine Linux</a> is a lightweight distribution using <a href="https://www.musl-libc.org/">musl libc</a>, a lightweight alternative to <a href="https://www.gnu.org/software/libc/">glibc</a>, and <a href="https://wiki.gentoo.org/wiki/Project:OpenRC">openrc</a> as an alternative to <a href="https://www.freedesktop.org/wiki/Software/systemd/">systemd</a> maintained by Gentoo developers. It also uses <a href="https://grsecurity.net/">grsec</a> kernel patches and <a href="https://busybox.net/about.html">busybox</a> instead of a complete GNU core utilities. It has its own package manager with a very simple packaging format similar to ArchLinux PKGBUILD.</p>
+<p>This distribution is not for everyone as it has been stripped down and a lot of things won’t work as expected. For instance, you won’t be able to use <code>man</code> out of the box, and <code>lspci</code> will give you a cryptic output. This is of course fixable, but this is not the topic of this post. There is <a href="https://wiki.alpinelinux.org/wiki/How_to_get_regular_stuff_working">a page</a> to get most of the standard unix tools working.</p>
+<p>On the plus side, you will have a working Linux environment able to run any application (web server, database, docker, etc…) with a very small memory and hard drive footprint.</p>
+<p>You can find more compelling arguments on <a href="https://www.reddit.com/r/linux/comments/3mqqtx/alpine_linux_why_no_one_is_using_it/">this reddit thread</a>.</p>
+<h2 id="boot-your-vps-in-rescue-mode">Boot your VPS in rescue mode</h2>
+<p>You will first need to boot your VPS in recovery mode. On the admin page of your VPS, click on <em>Reboot my VPS</em>, and tick the <em>Reboot in rescue mode</em> option.</p>
+<p><img src="../images/ovh-reboot-in-rescue-mode.png" alt="Reboot in rescue mode" /><br />
+This step takes a while (about 5 minutes, and not 2 as they estimate), so you should grab a cup of coffee or do something else. Unless of course you like watching their progress bar that is almost never updated. Once it’s finished, you will receive an email with the parameters to connect to your server via ssh.</p>
+<h2 id="setup-the-disks">Setup the disks</h2>
+<p>The VPS might be formatted in ext3. If that’s the case, I would recommend reformatting it in ext4 as it yields better performance. To do that, you can use the following commands:</p>
+<pre><code># umount /mnt/sdb1
+# mkfs.ext4 /dev/sdb1
+# mount /mnt/sdb1</code></pre>
+<p>If the <a href="https://ext4.wiki.kernel.org/index.php/Ext4_Disk_Layout#Blocks">64bit feature of the ext4 filesystem</a> is enabled, you will need to disable it as <a href="http://www.syslinux.org/wiki/index.php?title=Filesystem#ext">syslinux doesn’t support it</a>. It should not be the case for OVH VPS, but just in case here are the commands to check and disable this feature.</p>
+<pre><code># dumpe2fs /dev/sdb1 | grep 64bit
+Filesystem features:      (...) 64bit (...)
+# resize2fs -s /dev/sdb1</code></pre>
+<h2 id="install-the-system">Install the system</h2>
+<p>This procedure is mostly inspired from this page of the Alpine Linux wiki: <a href="https://wiki.alpinelinux.org/wiki/Installing_Alpine_Linux_in_a_chroot">chroot installation</a>. I added some necessary steps to have a fully functional system.</p>
+<p>First, you need to choose a mirror from <a href="http://nl.alpinelinux.org/alpine/MIRRORS.txt">this page</a>. If like mine your VPS is hosted in Europe, the mirror below should be fast enough.</p>
+<pre><code># export mirror=http://distrib-coffee.ipsl.jussieu.fr/pub/linux/alpine/alpine/
+# export chroot_dir=/mnt/sdb1</code></pre>
+<p>Then, you need to download the <code>apk</code> binary, Alpine’s package manager. The version variable can be found on <a href="https://pkgs.alpinelinux.org/packages?name=apk-tools-static&amp;branch=&amp;repo=&amp;arch=&amp;maintainer=">this page</a>. For instance, when I wrote this post, it was 2.6.8-r2 for Alpine v3.5 (the latest stable).</p>
+<pre><code># export version=2.6.8-r2
+# wget ${mirror}/latest-stable/main/x86_64/apk-tools-static-${version}.apk
+# tar -xzf apk-tools-static-*.apk
+# ./sbin/apk.static -X ${mirror}/latest-stable/main -U --allow-untrusted --root ${chroot_dir} --initdb add alpine-base</code></pre>
+<p>Then, you will need to create and copy some files to the newly created system before running chroot. You should replace the branch variable by the latest version of Alpine.</p>
+<pre><code># export branch=v3.5
+# cp /etc/resolv.conf ${chroot_dir}/etc/
+# echo &quot;${mirror}/${branch}/main&quot; &gt; ${chroot_dir}/etc/apk/repositories</code></pre>
+<p>You will also need to mount some pseudo-filesystems.</p>
+<pre><code># mount -t proc none ${chroot_dir}/proc
+# mount -o bind /sys ${chroot_dir}/sys
+# mount -o bind /dev ${chroot_dir}/dev</code></pre>
+<p>You are now ready to chroot into your VPS and perform the system setup.</p>
+<pre><code># chroot ${chroot_dir} /bin/sh -l</code></pre>
+<p>Now, you can do some setup. This step is pretty straightforward, you just have to follow the instructions. It will setup the apk repository, the hostname, the keymap and the timezone of your server.</p>
+<pre><code># apk update
+# setup-apkrepos
+# setup-apkcache
+# setup-hostname
+# setup-keymap
+# setup-timezone</code></pre>
+<p>The interface setup is a bit more tricky. You usually have a <code>/32</code> address but you also need a gateway for network access, so you cannot use the <code>gateway</code> keyword. Therefore, the <code>setup-interfaces</code> script won’t work.</p>
+<p>Here is how your <code>/etc/network/interfaces</code> file should look like assuming your IP address is <code>12.34.56.78</code>. You might notice that it is very similar to the interface setup file of Debian. This is because Alpine is also using <a href="http://packages.debian.org/ifupdown">ifupdown</a>.</p>
+<pre><code># cat /etc/network/interfaces 
+auto lo
+iface lo inet loopback
+
+auto eth0
+iface eth0 inet static
+  address 12.34.56.78
+  netmask 255.255.255.255
+  broadcast 12.34.56.78
+  post-up route add 12.34.56.1 dev eth0
+  post-up route add default gw 12.34.56.1
+  post-down route del default gw 12.34.56.1
+  post-down route del 12.34.56.1 dev eth0</code></pre>
+<p>The <code>post-up</code> and <code>post-down</code> options are used to setup and delete the routes when the interface is create and deleted. You should also check the actual address for the gateway with the following command:</p>
+<pre><code># ip route
+default via 12.34.56.1 dev eth0 
+12.34.56.1 dev eth0 </code></pre>
+<p>You can now install an ssh and ntp server. I used the suggested ones (openssh and chrony).</p>
+<pre><code># setup-sshd
+# setup-ntp</code></pre>
+<p>You will also need to choose a root password.</p>
+<pre><code># passwd</code></pre>
+<p>You can also create some users now. The ssh access is disabled by default for root user, so if you bypass this step don’t forget to enable it.</p>
+<pre><code># adduser admin
+# addgroup admin wheel</code></pre>
+<h2 id="enable-openrc-services">Enable openrc services</h2>
+<p>By default, all the services are disabled, making the system unbootable. You should enable these services as suggested in the wiki.</p>
+<pre><code>rc-update add devfs sysinit
+rc-update add dmesg sysinit
+rc-update add mdev sysinit
+rc-update add hwclock boot
+rc-update add modules boot
+rc-update add sysctl boot
+rc-update add hostname boot
+rc-update add bootmisc boot
+rc-update add syslog boot
+rc-update add mount-ro shutdown
+rc-update add killprocs shutdown
+rc-update add savecache shutdown</code></pre>
+<p>You will also need those services, which are not mentioned in the Alpine wiki but are enabled when performing the Alpine installation with the CD.</p>
+<pre><code>rc-update add networking boot
+rc-update add urandom boot
+rc-update add acpid default
+rc-update add hwdrivers sysinit
+rc-update add crond default</code></pre>
+<h2 id="install-a-kernel-and-a-bootloader">Install a kernel and a bootloader</h2>
+<p>Because we performed a chroot installation, there is no kernel and no bootloader installed. The commands are taken from <a href="https://wiki.alpinelinux.org/wiki/Install_to_disk">this wiki page</a>.</p>
+<pre><code># apk add linux-grsec syslinux</code></pre>
+<p>Now, you can install the bootloader (syslinux) on your hard drive.</p>
+<pre><code># dd bs=440 count=1 if=/usr/share/syslinux/mbr.bin of=/dev/sdb
+# extlinux -i /boot</code></pre>
+<p>You should also modify the syslinux configuration, especially the <code>root</code> filesystem and the <code>modules</code> variable (to add ext4):</p>
+<pre><code># blkid /dev/sdb1
+/dev/sdb1: UUID=&quot;730e779d-8738-4405-97a2-8fa6bc005747&quot; TYPE=&quot;ext4&quot;
+# export root=UUID=730e779d-8738-4405-97a2-8fa6bc005747
+# sed -i -e &quot;s:^root=.*:root=$root:&quot; /etc/update-extlinux.conf
+# sed -i -e &quot;s:^modules=.*:modules=sd-mod,usb-storage,ext4:&quot; /etc/update-extlinux.conf
+# update-extlinux</code></pre>
+<p>Finally, you should add your root device to the fstab file.</p>
+<pre><code># echo &quot;$root / ext4 rw,relatime,data=ordered 0 0&quot; &gt; /etc/fstab
+# mkinitfs $(ls /lib/modules)</code></pre>
+<p>You can now reboot from your OVH interface and enjoy your new lightweight and fully functional Alpine Linux VPS. The first boot might take a while as your ssh key is being created.</p>
+<h2 id="final-thoughts">Final thoughts</h2>
+<p>While installing a server this way is a bit tedious and not recommended for large scale deployment, you learn a lot about how your system works.</p>
+<p>Alpine Linux is a very simple distribution, making a manual installation quite straightforward. Actually, the installation CD only provides scripts to automate this process, and we used some of them (remember the <code>setup-*</code> scripts?).</p>
+<p>Here are some resources to start with Alpine:</p>
+<ul>
+<li><a href="https://wiki.alpinelinux.org/wiki/Alpine_Linux_package_management">Using APK</a></li>
+<li><a href="https://pkgs.alpinelinux.org/packages">Search packages</a></li>
+<li><a href="https://wiki.alpinelinux.org/wiki/Tutorials_and_Howtos">Tutorials and Howtos</a></li>
+<li><a href="https://wiki.alpinelinux.org/wiki/How_to_get_regular_stuff_working">Get most stuff working</a></li>
+<li><a href="https://wiki.alpinelinux.org/wiki/Installation">Some advances installation and post-install guides</a></li>
+<li><a href="http://it-offshore.co.uk/linux/alpine-linux/64-alpine-linux-kvm-vps-without-a-custom-iso">Alternative installation method on OVH</a></li>
+</ul>
+
+<div id="disqus_thread"></div>
+<script>
+
+var disqus_config = function () {
+  this.page.url = "http://nicolas.porcel.me/posts/2017-05-11-how-to-install-alpine-on-ovh.markdown";
+  this.page.identifier = "posts/2017-05-11-how-to-install-alpine-on-ovh.markdown";
+};
+(function() {
+  var d = document, s = d.createElement('script');
+  s.src = '//http-nicolas-porcel-me.disqus.com/embed.js';
+  s.setAttribute('data-timestamp', +new Date());
+  (d.head || d.body).appendChild(s);
+})();
+</script>
+
+        </div>
+
+        <div id="footer">
+            Site proudly generated by <a href="http://jaspervdj.be/hakyll">Hakyll</a><br />
+            This blog is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International License</a>.
+        </div>
+    </body>
+
+    <!--Google Analytics-->
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-70461809-1', 'auto');
+      ga('send', 'pageview');
+
+    </script>
+</html>
