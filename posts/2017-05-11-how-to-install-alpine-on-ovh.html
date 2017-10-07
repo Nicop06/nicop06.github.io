@@ -55,17 +55,16 @@ Filesystem features:      (...) 64bit (...)
 <h2 id="install-the-system">Install the system</h2>
 <p>This procedure is mostly inspired from this page of the Alpine Linux wiki: <a href="https://wiki.alpinelinux.org/wiki/Installing_Alpine_Linux_in_a_chroot">chroot installation</a>. I added some necessary steps to have a fully functional system.</p>
 <p>First, you need to choose a mirror from <a href="http://nl.alpinelinux.org/alpine/MIRRORS.txt">this page</a>. If like mine your VPS is hosted in Europe, the mirror below should be fast enough.</p>
-<pre><code># export mirror=http://distrib-coffee.ipsl.jussieu.fr/pub/linux/alpine/alpine/
+<pre><code># export mirror=http://dl-3.alpinelinux.org/alpine
 # export chroot_dir=/mnt/sdb1</code></pre>
-<p>Then, you need to download the <code>apk</code> binary, Alpine’s package manager. The version variable can be found on <a href="https://pkgs.alpinelinux.org/packages?name=apk-tools-static&amp;branch=&amp;repo=&amp;arch=&amp;maintainer=">this page</a>. For instance, when I wrote this post, it was 2.6.8-r2 for Alpine v3.5 (the latest stable).</p>
-<pre><code># export version=2.6.8-r2
+<p>Then, you need to download the <code>apk</code> binary, Alpine’s package manager. The version variable can be found on <a href="https://pkgs.alpinelinux.org/packages?name=apk-tools-static&amp;branch=&amp;repo=&amp;arch=&amp;maintainer=">this page</a>. For instance, when I wrote this post, it was 2.7.3-r0 for Alpine v3.6 (the latest stable).</p>
+<pre><code># export version=2.7.3-r0
 # wget ${mirror}/latest-stable/main/x86_64/apk-tools-static-${version}.apk
 # tar -xzf apk-tools-static-*.apk
 # ./sbin/apk.static -X ${mirror}/latest-stable/main -U --allow-untrusted --root ${chroot_dir} --initdb add alpine-base</code></pre>
 <p>Then, you will need to create and copy some files to the newly created system before running chroot. You should replace the branch variable by the latest version of Alpine.</p>
-<pre><code># export branch=v3.5
-# cp /etc/resolv.conf ${chroot_dir}/etc/
-# echo &quot;${mirror}/${branch}/main&quot; &gt; ${chroot_dir}/etc/apk/repositories</code></pre>
+<pre><code># export branch=v3.6
+# cp /etc/resolv.conf ${chroot_dir}/etc/</code></pre>
 <p>You will also need to mount some pseudo-filesystems.</p>
 <pre><code># mount -t proc none ${chroot_dir}/proc
 # mount -o bind /sys ${chroot_dir}/sys
@@ -73,8 +72,8 @@ Filesystem features:      (...) 64bit (...)
 <p>You are now ready to chroot into your VPS and perform the system setup.</p>
 <pre><code># chroot ${chroot_dir} /bin/sh -l</code></pre>
 <p>Now, you can do some setup. This step is pretty straightforward, you just have to follow the instructions. It will setup the apk repository, the hostname, the keymap and the timezone of your server.</p>
-<pre><code># apk update
-# setup-apkrepos
+<pre><code># setup-apkrepos
+# apk update
 # setup-apkcache
 # setup-hostname
 # setup-keymap
