@@ -79,16 +79,16 @@ First, you need to choose a mirror from [this page][alpine_mirrors]. If like
 mine your VPS is hosted in Europe, the mirror below should be fast enough.
 
 ```
-# export mirror=http://distrib-coffee.ipsl.jussieu.fr/pub/linux/alpine/alpine/
+# export mirror=http://dl-3.alpinelinux.org/alpine
 # export chroot_dir=/mnt/sdb1
 ```
 
 Then, you need to download the `apk` binary, Alpine's package manager. The
 version variable can be found on [this page][apk_tools_version]. For instance,
-when I wrote this post, it was 2.6.8-r2 for Alpine v3.5 (the latest stable).
+when I wrote this post, it was 2.7.3-r0 for Alpine v3.6 (the latest stable).
 
 ```
-# export version=2.6.8-r2
+# export version=2.7.3-r0
 # wget ${mirror}/latest-stable/main/x86_64/apk-tools-static-${version}.apk
 # tar -xzf apk-tools-static-*.apk
 # ./sbin/apk.static -X ${mirror}/latest-stable/main -U --allow-untrusted --root ${chroot_dir} --initdb add alpine-base
@@ -99,9 +99,8 @@ before running chroot. You should replace the branch variable by the latest
 version of Alpine.
 
 ```
-# export branch=v3.5
+# export branch=v3.6
 # cp /etc/resolv.conf ${chroot_dir}/etc/
-# echo "${mirror}/${branch}/main" > ${chroot_dir}/etc/apk/repositories
 ```
 
 You will also need to mount some pseudo-filesystems.
@@ -123,8 +122,8 @@ to follow the instructions. It will setup the apk repository, the hostname, the
 keymap and the timezone of your server.
 
 ```
-# apk update
 # setup-apkrepos
+# apk update
 # setup-apkcache
 # setup-hostname
 # setup-keymap
