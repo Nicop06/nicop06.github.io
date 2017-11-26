@@ -100,6 +100,8 @@ version of Alpine.
 
 ```
 # export branch=v3.6
+# mkdir -p ${chroot_dir}/etc/apk
+# echo "${mirror}/${branch}/main" > ${chroot_dir}/etc/apk/repositories
 # cp /etc/resolv.conf ${chroot_dir}/etc/
 ```
 
@@ -122,8 +124,9 @@ to follow the instructions. It will setup the apk repository, the hostname, the
 keymap and the timezone of your server.
 
 ```
-# setup-apkrepos
 # apk update
+# apk add alpine-mirror
+# setup-apkrepos
 # setup-apkcache
 # setup-hostname
 # setup-keymap
