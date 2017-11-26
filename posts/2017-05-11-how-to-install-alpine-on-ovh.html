@@ -64,6 +64,8 @@ Filesystem features:      (...) 64bit (...)
 # ./sbin/apk.static -X ${mirror}/latest-stable/main -U --allow-untrusted --root ${chroot_dir} --initdb add alpine-base</code></pre>
 <p>Then, you will need to create and copy some files to the newly created system before running chroot. You should replace the branch variable by the latest version of Alpine.</p>
 <pre><code># export branch=v3.6
+# mkdir -p ${chroot_dir}/etc/apk
+# echo &quot;${mirror}/${branch}/main&quot; &gt; ${chroot_dir}/etc/apk/repositories
 # cp /etc/resolv.conf ${chroot_dir}/etc/</code></pre>
 <p>You will also need to mount some pseudo-filesystems.</p>
 <pre><code># mount -t proc none ${chroot_dir}/proc
@@ -72,8 +74,9 @@ Filesystem features:      (...) 64bit (...)
 <p>You are now ready to chroot into your VPS and perform the system setup.</p>
 <pre><code># chroot ${chroot_dir} /bin/sh -l</code></pre>
 <p>Now, you can do some setup. This step is pretty straightforward, you just have to follow the instructions. It will setup the apk repository, the hostname, the keymap and the timezone of your server.</p>
-<pre><code># setup-apkrepos
-# apk update
+<pre><code># apk update
+# apk add alpine-mirror
+# setup-apkrepos
 # setup-apkcache
 # setup-hostname
 # setup-keymap
