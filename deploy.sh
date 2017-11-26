@@ -26,7 +26,7 @@ rsync -a --filter='P _site/'      \
 
 # Commit
 git add -A
-git commit
+git commit -e -m "$(git log -1 --pretty=format:%B develop)"
 
 # Push
 git push origin master:master
