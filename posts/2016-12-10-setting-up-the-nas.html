@@ -41,7 +41,8 @@
 <h2 id="starting-the-installation">Starting the installation</h2>
 <p>You can download the <a href="https://www.debian.org/CD/netinst/">latest stable Debian netinstall ISO</a>. Once it boots, go to <em>Advanced Options</em> and select <em>Expert install</em>. Then, follow the instructions until you reach the <em>Load installer components from CD</em> part. You might want to select <code>cfdisk</code> or <code>gparted</code> to manually create your disk layout if you are used to them. In this post, we will directly use <code>fdisk</code>.</p>
 <p><img src="../images/debian-load-installer-components.png" alt="Debian load installer components" /><br />
-Continue until you reach the <em>Partition disks</em> part. At this point, you will need to stop the installation process and go to the second terminal by entering <em>CTRL+ALT+F2</em>. You will then need to perform some manual setup.</p>
+</p>
+<p>Continue until you reach the <em>Partition disks</em> part. At this point, you will need to stop the installation process and go to the second terminal by entering <em>CTRL+ALT+F2</em>. You will then need to perform some manual setup.</p>
 <h2 id="drives-setup">Drives setup</h2>
 <p>The purpose of the server is to provide accessible and reliable storage for the whole network, so this is the most important part of the setup. My NAS has two 1TB disks and one 2TB disk, and I will create a 2TB redundant storage. Even if it is recommended to have disks of the same size, it is possible to use all the disks in an efficient way and have redundancy.</p>
 <h3 id="partitioning">Partitioning</h3>
@@ -143,7 +144,8 @@ LABEL=nas /home   btrfs rw,relatime,subvol=debian/home 0 0
 <h2 id="resuming-the-installation">Resuming the installation</h2>
 <p>Now, go back to the installation media by typing <em>CTRL+ALT+F1</em>, skip the partitioning step and run directly the <em>install the base system</em> step. Don’t worry if you get the following message, you can ignore it by selecting <code>&lt;Go Back&gt;</code>. You might need to do that more than once.</p>
 <p><img src="../images/debian-error-partitioning.png" alt="Debian error partitioning" /><br />
-The installation step may take a while depending on the disks you are using or your network speed. While this is installing, you can go to <em>/mnt/debian/root</em> and <em>/mnt/debian/var</em> and observe the different files being copied. These are the same files than in <em>/target</em> and in <em>/target/var</em>.</p>
+</p>
+<p>The installation step may take a while depending on the disks you are using or your network speed. While this is installing, you can go to <em>/mnt/debian/root</em> and <em>/mnt/debian/var</em> and observe the different files being copied. These are the same files than in <em>/target</em> and in <em>/target/var</em>.</p>
 <p>If you go to <em>/mnt/debian</em>, you can rename any subvolume and everything will still work. This is as if they where regular folders, but they can be mounted as any other partition. This has some nice applications. For instance, you can replace the root partition with a snapshot while it is running and reboot the system. This will basically rollback the system at the state it was when you performed the snapshot.</p>
 <h2 id="the-bootloader">The bootloader</h2>
 <p>Finally, you will need to install the grub bootloader, as any other boot loader might not be able to boot a Btrfs filesystem. Syslinux may work but doesn’t support compression or encryption according to the <a href="http://www.syslinux.org/wiki/index.php?title=Filesystem#Btrfs">Syslinux wiki</a>. If you still want to use an incompatible setup, you will have to create a dedicated boot partition formatted to FAT32 or EXT 2/3/4 for instance.</p>
@@ -187,16 +189,4 @@ var disqus_config = function () {
             This blog is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International License</a>.
         </div>
     </body>
-
-    <!--Google Analytics-->
-    <script>
-      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-
-      ga('create', 'UA-70461809-1', 'auto');
-      ga('send', 'pageview');
-
-    </script>
 </html>
