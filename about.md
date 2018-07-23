@@ -15,7 +15,7 @@ Feel free to contact me if you have any question:
 
 * You can follow me on [Twitter][], although I am not very active.
 * You can see my contributions and projects on [Github][].
-* I ocasionally help people on [Stack Overflow][].
+* I occasionally help people on [Stack Overflow][].
 * You also can connect with me on [LinkedIn][].
 * I sometimes connect to [Freenode][] under the alias *Nicop06*.
 
