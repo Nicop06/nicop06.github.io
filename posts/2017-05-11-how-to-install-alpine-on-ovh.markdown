@@ -85,7 +85,7 @@ mine your VPS is hosted in Europe, the mirror below should be fast enough.
 
 Then, you need to download the `apk` binary, Alpine's package manager. The
 version variable can be found on [this page][apk_tools_version]. For instance,
-when I wrote this post, it was 2.10.4-r2 for Alpine v3.10 (the latest stable).
+when I wrote this post, it was 2.10.4-r3 for Alpine v3.11 (the latest stable).
 
 ```
 # export version=2.10.4-r2
@@ -99,7 +99,7 @@ before running chroot. You should replace the branch variable by the latest
 version of Alpine.
 
 ```
-# export branch=v3.10
+# export branch=v3.11
 # mkdir -p ${chroot_dir}/etc/apk
 # echo "${mirror}/${branch}/main" > ${chroot_dir}/etc/apk/repositories
 # cp /etc/resolv.conf ${chroot_dir}/etc/
