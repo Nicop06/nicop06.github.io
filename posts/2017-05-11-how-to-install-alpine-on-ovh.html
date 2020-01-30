@@ -58,13 +58,13 @@ Filesystem features:      (...) 64bit (...)
 <p>First, you need to choose a mirror from <a href="http://nl.alpinelinux.org/alpine/MIRRORS.txt">this page</a>. If like mine your VPS is hosted in Europe, the mirror below should be fast enough.</p>
 <pre><code># export mirror=http://dl-3.alpinelinux.org/alpine
 # export chroot_dir=/mnt/sdb1</code></pre>
-<p>Then, you need to download the <code>apk</code> binary, Alpine’s package manager. The version variable can be found on <a href="https://pkgs.alpinelinux.org/packages?name=apk-tools-static&amp;branch=&amp;repo=&amp;arch=&amp;maintainer=">this page</a>. For instance, when I wrote this post, it was 2.10.4-r2 for Alpine v3.10 (the latest stable).</p>
+<p>Then, you need to download the <code>apk</code> binary, Alpine’s package manager. The version variable can be found on <a href="https://pkgs.alpinelinux.org/packages?name=apk-tools-static&amp;branch=&amp;repo=&amp;arch=&amp;maintainer=">this page</a>. For instance, when I wrote this post, it was 2.10.4-r3 for Alpine v3.11 (the latest stable).</p>
 <pre><code># export version=2.10.4-r2
 # wget ${mirror}/latest-stable/main/x86_64/apk-tools-static-${version}.apk
 # tar -xzf apk-tools-static-*.apk
 # ./sbin/apk.static -X ${mirror}/latest-stable/main -U --allow-untrusted --root ${chroot_dir} --initdb add alpine-base</code></pre>
 <p>Then, you will need to create and copy some files to the newly created system before running chroot. You should replace the branch variable by the latest version of Alpine.</p>
-<pre><code># export branch=v3.10
+<pre><code># export branch=v3.11
 # mkdir -p ${chroot_dir}/etc/apk
 # echo &quot;${mirror}/${branch}/main&quot; &gt; ${chroot_dir}/etc/apk/repositories
 # cp /etc/resolv.conf ${chroot_dir}/etc/</code></pre>
