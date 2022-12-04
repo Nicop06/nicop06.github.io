@@ -3,7 +3,7 @@ title: About
 ---
 
 My name is Nicolas Porcel.  I am currently a Software Engineer
-[Amadeus](http://www.amadeus.com).  Before that, I studied at
+[DeepMind](www.deepmind.com).  Before that, I studied at
 [Supelec](http://www.supelec.fr/), a French engineering school.  If you
 want to know more about my curriculum, you can download my
 [CV](/files/cv-nporcel.pdf).
