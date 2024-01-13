@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="x-ua-compatible" content="ie=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Nicolas Porcel's Blog - How to build a NAS for 300€</title>
+        <link rel="stylesheet" href="../css/default.css" />
+        <link rel="stylesheet" href="../css/syntax.css" />
+        <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
+    </head>
+    <body>
+        <div id="header">
+            <div id="logo">
+                <a href="../">Nicolas Porcel's Blog</a>
+            </div>
+            <div id="navigation">
+                <a href="../">Home</a>
+                <a href="../about.html">About</a>
+                <a href="../archive.html">Archive</a>
+            </div>
+        </div>
+
+        <div id="content">
+            <h1>How to build a NAS for 300€</h1>
+            <div class="info">
+    Posted on November 12, 2016
+    
+</div>
+<div class="info">
+  
+  Tags: <a title="All pages tagged 'NAS'." href="../tags/NAS.html" rel="tag">NAS</a>, <a title="All pages tagged 'hardware'." href="../tags/hardware.html" rel="tag">hardware</a>
+  
+</div>
+
+<p>This post describes the story of how I built a new NAS and media center from
+scratch, including hardware and software part.</p>
+<h2 id="the-previous-setup">The previous setup</h2>
+<p>It all started a few weeks ago when one of the drives on my NAS started making
+a weird noise. Since 2013, I was running an old <a href="http://www.amazon.co.uk/Dell-Optiplex-GX270-Professional-pre-installed/dp/B001UU3UMO">Optilex GX270</a> equipped with
+two brand new <a href="http://www.amazon.com/Blue-Desktop-Hard-Disk-Drive/dp/B0088PUEPK/ref=sr_1_1?ie=UTF8&amp;qid=1447200731&amp;sr=8-1&amp;keywords=western+digital+blue">WD Blue 1TB</a> in ZFS raid 1 and running <a href="https://www.freebsd.org/">FreeBSD</a>. The
+motherboard offers “wake on lan” from full shutdown, which was great as I
+didn’t need it to be constantly running. I was quite happy with this setup, but
+I was waiting for something to go wrong to upgrade to newer hardware.</p>
+<p><img src="../images/Optiplex-GX270.jpg" alt="Optilex GX270" /><br />
+</p>
+<h2 id="the-new-setup">The new setup</h2>
+<p>I wanted a small and powerful enough setup so that it could serve as a media
+center under my TV. I was thus looking for a budget configuration with a case
+that could fit under my TV stand and that could host at least 2 and ideally 4
+3.5’’ HDDs.</p>
+<h3 id="the-case">The case</h3>
+<p><img src="../images/coolarmaster_elite_110.jpg" alt="Cooler Master Elite 110" /><br />
+</p>
+<p>The first piece I chose was the case. I picked the <a href="http://www.coolermaster.com/case/mini-itx-elite-series/elite110/">Cooler Master Elite 110</a>
+as it could host 3 3.5’’ HDDs or 2 3.5’’ + 2 2.5’’ HDDs. It’s a cubic case of
+around 20-25 cm, the perfect size to fit on my TV stand. As for the price, it
+was under 50€. The drawback is that everything is packed and the hard drives
+are screwed to the case, so not easily replaced. But at this price, I didn’t
+expect hot swappable bays.</p>
+<h3 id="the-motherboard-and-cpu">The Motherboard and CPU</h3>
+<p><img src="../images/ASRock_Q1900-ITX.jpg" alt="ASRock Q1900-ITX" /><br />
+</p>
+<p>I didn’t need huge amount of power, so I chose a motherboard with an integrated
+CPU and a graphical circuit. ASRock ITX motherboard exactly fits my need, and
+costs only 80€ with the integrated CPU. This is the subsidiary brand of Asus,
+created to sell their low cost products without impacting their reputation. I
+preferred an Intel CPU for their great Linux support, although the AMD APU are
+usually good choice for such use as their integrated GPU is much more powerful.
+I therefore chose the <a href="http://www.asrock.com/mb/Intel/Q1900-ITX/">ASRock Q1900-ITX</a>, with the following specifications:</p>
+<ul>
+<li>An <a href="http://ark.intel.com/products/78867/Intel-Celeron-Processor-J1900-2M-Cache-up-to-2_42-GHz">Intel Quad-Core J1900</a>, with 2.4GHz and 2M Cache, a low
+power but powerful processor with a decent integrated GPU. There are no
+fans to cool the CPU, so it is perfect for a silent configuration. Also, I
+could barely reach the 50°C with maximum load after 10 minutes, and the
+compilation of a Linux Kernel took less than twice as much time as my
+<a href="http://ark.intel.com/products/52219/Intel-Core-i7-2630QM-Processor-6M-Cache-up-to-2_90-GHz">Intel i7-2630QM</a>, which reached the 90°C.</li>
+<li>Two RAM slots (8GB each), more than enough for future upgrade.</li>
+<li>Up to 4 SATA ports (2 SATA2 and 2 SATA3), exactly the number required to
+fill the case.</li>
+<li>Realtek Gigabit Ethernet controller for high speed file sharing. Although
+my router is limited to 100Mbps bandwidth, I plan on investing in a Gigabit
+router soon.</li>
+<li>DVI, VGA and HDMI ports are all available so you are sure to find a way to
+connect your device to any screen</li>
+<li>7.1 HD Audio</li>
+<li>USB 3.0</li>
+<li>PCIe, COM and Print Port</li>
+</ul>
+<p>Nothing exceptional, but everything you except to find is there and you won’t
+have any surprise. I was also surprised to see two SATA cables provided with
+the motherboard.</p>
+<h3 id="the-power-supply">The power supply</h3>
+<p><img src="../images/FSP-350W.jpg" alt="FSP 350W" /><br />
+</p>
+<p>As for the power supply, I bought a <a href="http://www.fsp-group.com.tw/index.php?do=proinfo&amp;id=144">FSP 350W 80PLUS</a>. It is a bit too
+powerful for the current setup, but it is cheap (around 40€), from a renowned
+brand and with high power efficiency. It also has all the connectors you need
+for a small configuration like the one I use. There are only 3 SATA connectors
+but they can be extended using the two Molex connectors and a <a href="http://www.amazon.com/StarTech-com-12-Inch-Power-Cable-Adapter/dp/B0002GRUV4/ref=sr_1_4?ie=UTF8&amp;qid=1447262448&amp;sr=8-4&amp;keywords=molex+to+sata">proper
+adapter</a>.</p>
+<h3 id="storage">Storage</h3>
+<p><img src="../images/WD_Green_2TB.jpg" alt="WD Green 2TB" /><br />
+</p>
+<p>I only bought one <a href="http://www.amazon.com/Green-2TB-Desktop-Hard-Drive/dp/B008YAHW6I/ref=sr_1_1?ie=UTF8&amp;qid=1447262513&amp;sr=8-1&amp;keywords=wd+green+2tb">WD Green 2TB</a> for arround 80€ as I already had my two
+other 1TB hard drives from the previous configuration. This enabled me to have
+up to 2TB of data with redundancy. I also didn’t see the point of buying
+expensive WD Red, which are supposed to be better for NAS. Indeed, my server
+would only be up a few hours per week.</p>
+<h3 id="ram">RAM</h3>
+<p>I had 2 2GB SODIMM RAM sticks to spare as I upgraded the memory on my laptop so
+I used them for the server. 4GB is enough for me, but considering the price of
+the RAM these days I would recommend to buy at least 8GB of RAM, which you can
+find for 50€.</p>
+<h2 id="assembling-the-nas">Assembling the NAS</h2>
+<p><img src="../images/nas_inside.jpg" alt="NAS Inside" /><br />
+</p>
+<p>The next step was to assemble everything. This was pretty straightforward, and
+the case provided enough screws for the 3 HDDs, the motherboard and the power
+supply. The only problem I had was the SATA cables. In fact, the case is
+designed such that the drives are turned towards the outside of the case. This
+made it impossible to use the <a href="http://www.amazon.com/StarTech-Right-Angle-Serial-Cable/dp/B004ZMYKPU/ref=sr_1_1?ie=UTF8&amp;qid=1447517581&amp;sr=8-1&amp;keywords=right+angled+sata+cable&amp;pebp=1447517603839&amp;perid=08F46Z71HWRC1CXCGZMS">right-angled cable</a> which was provided. I also
+tried to use them on the motherboard, but the ports are placed such that the
+cable is covering another SATA port of the board. In my case, I was lucky to
+have 2 straight SATA cables that I used for the SATA3 ports, and I plugged my
+right-angled cable on the SATA2 port. But if you buy cables for this case, I
+highly recommend buying <a href="http://www.amazon.com/StarTech-com-SATA12LA1-12-Inch-Angle-Serial/dp/B004KDTTXW/ref=sr_1_1?ie=UTF8&amp;qid=1447518102&amp;sr=8-1&amp;keywords=left+angled+sata+cable">left-angled cables</a>.</p>
+<p><img src="../images/nas_with_power_supply.jpg" alt="NAS Inside" /><br />
+</p>
+<p>Then, I added the power supply.</p>
+<p><img src="../images/nas_with_HDD.jpg" alt="NAS Inside" /><br />
+</p>
+<p>And finally, I added the 3 drives. The last one is on the opposite side of the
+picture.</p>
+<h2 id="setting-up-the-uefi">Setting up the UEFI</h2>
+<p>The last step was to setup the UEFI to be able to wake from LAN and USB, as the
+motherboard is capable of both. I also needed to disable Windows 8 fast boot
+and activate legacy MBR boot. The interface is minimalistic but it is easy to
+find the required options. And now, we are ready to setup the system.</p>
+<h2 id="conclusion">Conclusion</h2>
+<p>With this setup, you now have a NAS for just over 300€, with possibility to
+upgrade and 2To of hard drive. The configuration is powerful enough and compact
+enough to be used as a media center. <a href="2016-12-10-setting-up-the-nas.html">In the next post</a>, I will
+discuss the software setup.</p>
+
+<div id="disqus_thread"></div>
+<script>
+
+var disqus_config = function () {
+  this.page.url = "http://nicolas.porcel.me/posts/2016-11-12-building-a-cheap-nas.markdown";
+  this.page.identifier = "posts/2016-11-12-building-a-cheap-nas.markdown";
+};
+(function() {
+  var d = document, s = d.createElement('script');
+  s.src = '//http-nicolas-porcel-me.disqus.com/embed.js';
+  s.setAttribute('data-timestamp', +new Date());
+  (d.head || d.body).appendChild(s);
+})();
+</script>
+
+        </div>
+
+        <div id="footer">
+            <a rel="license" href="http://creativecommons.org/licenses/by/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by/4.0/88x31.png" /></a><br />This blog is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>.<br />
+            Site proudly generated by <a href="http://jaspervdj.be/hakyll">Hakyll</a>.
+        </div>
+    </body>
+</html>
