@@ -7,7 +7,7 @@ import           Hakyll
 --------------------------------------------------------------------------------
 main :: IO ()
 main = hakyllWith conf $ do
-    match ("images/*" .||. "files/*" .||. "CNAME") $ do
+    match ("images/*" .||. "files/*" .||. "CNAME" .||. "robots.txt") $ do
         route   idRoute
         compile copyFileCompiler
 
@@ -74,10 +74,18 @@ main = hakyllWith conf $ do
                 >>= loadAndApplyTemplate "templates/default.html" indexCtx
                 >>= relativizeUrls
 
+    create ["sitemap.xml"] $ do
+        route idRoute
+        compile $ do
+            posts <- recentFirst =<< loadAll "posts/*"
+            let sitemapCtx = listField "posts" sitemapPostCtx (return posts)
+            makeItem ""
+                >>= loadAndApplyTemplate "templates/sitemap.xml" sitemapCtx
+
     match "templates/*" $ compile templateBodyCompiler
 
   where
-    conf = defaultConfiguration { deployCommand = "./deploy.sh" }
+    conf = defaultConfiguration { deployCommand = "./deploy.sh", previewHost = "0.0.0.0" }
 
 
 --------------------------------------------------------------------------------
@@ -88,3 +96,9 @@ postCtx =
 
 postCtxWithTags :: Tags -> Context String
 postCtxWithTags tags = tagsField "tags" tags `mappend` postCtx
+
+sitemapPostCtx :: Context String
+sitemapPostCtx =
+    constField "siteRoot" "https://nicolas.porcel.me" `mappend`
+    dateField "date" "%Y-%m-%d" `mappend`
+    defaultContext
