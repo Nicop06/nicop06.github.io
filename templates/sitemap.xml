@@ -6,4 +6,16 @@
         <lastmod>$date$</lastmod>
     </url>
     $endfor$
+    <url>
+        <loc>$siteRoot$</loc>
+        <lastmod>$curdate$</lastmod>
+    </url>
+    <url>
+        <loc>$siteRoot$/about.html</loc>
+        <lastmod>$curdate$</lastmod>
+    </url>
+    <url>
+        <loc>$siteRoot$/archive.html</loc>
+        <lastmod>$curdate$</lastmod>
+    </url>
 </urlset>

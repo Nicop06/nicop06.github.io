@@ -3,6 +3,9 @@
 import           Data.Monoid (mappend)
 import           Hakyll
 
+--------------------------------------------------------------------------------
+siteRoot :: String
+siteRoot = "https://nicolas.porcel.me"
 
 --------------------------------------------------------------------------------
 main :: IO ()
@@ -78,7 +81,9 @@ main = hakyllWith conf $ do
         route idRoute
         compile $ do
             posts <- recentFirst =<< loadAll "posts/*"
-            let sitemapCtx = listField "posts" sitemapPostCtx (return posts)
+            let sitemapCtx = listField "posts" sitemapPostCtx (return posts) `mappend`
+                             constField "siteRoot" siteRoot `mappend`
+                             constField "curdate" "2025-09-29"
             makeItem ""
                 >>= loadAndApplyTemplate "templates/sitemap.xml" sitemapCtx
 
@@ -99,6 +104,6 @@ postCtxWithTags tags = tagsField "tags" tags `mappend` postCtx
 
 sitemapPostCtx :: Context String
 sitemapPostCtx =
-    constField "siteRoot" "https://nicolas.porcel.me" `mappend`
+    constField "siteRoot" siteRoot `mappend`
     dateField "date" "%Y-%m-%d" `mappend`
     defaultContext
