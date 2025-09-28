@@ -8,6 +8,9 @@ import Hakyll
 siteRoot :: String
 siteRoot = "https://nicolas.porcel.me"
 
+lastModifiedDate :: String
+lastModifiedDate = "2025-09-29"
+
 --------------------------------------------------------------------------------
 main :: IO ()
 main = hakyllWith conf $ do
@@ -87,7 +90,7 @@ main = hakyllWith conf $ do
       let sitemapCtx =
             listField "posts" sitemapPostCtx (return posts)
               `mappend` constField "siteRoot" siteRoot
-              `mappend` constField "curdate" "2025-09-29"
+              `mappend` constField "lastModifiedDate" lastModifiedDate
       makeItem ""
         >>= loadAndApplyTemplate "templates/sitemap.xml" sitemapCtx
 
