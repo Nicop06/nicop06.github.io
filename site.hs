@@ -93,7 +93,7 @@ main = hakyllWith conf $ do
 
   match "templates/*" $ compile templateBodyCompiler
   where
-    conf = defaultConfiguration {deployCommand = "./deploy.sh", previewHost = "0.0.0.0"}
+    conf = defaultConfiguration {deployCommand = "./deploy.sh"}
 
 --------------------------------------------------------------------------------
 postCtx :: Context String
