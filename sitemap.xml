@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+    
+    <url>
+        <loc>https://nicolas.porcel.me/posts/2017-05-11-how-to-install-alpine-on-ovh.html</loc>
+        <lastmod>2017-05-11</lastmod>
+    </url>
+    
+    <url>
+        <loc>https://nicolas.porcel.me/posts/2016-12-22-extract-script-from-git-repository.html</loc>
+        <lastmod>2016-12-22</lastmod>
+    </url>
+    
+    <url>
+        <loc>https://nicolas.porcel.me/posts/2016-12-10-setting-up-the-nas.html</loc>
+        <lastmod>2016-12-10</lastmod>
+    </url>
+    
+    <url>
+        <loc>https://nicolas.porcel.me/posts/2016-12-03-choosing-the-OS.html</loc>
+        <lastmod>2016-12-03</lastmod>
+    </url>
+    
+    <url>
+        <loc>https://nicolas.porcel.me/posts/2016-11-12-building-a-cheap-nas.html</loc>
+        <lastmod>2016-11-12</lastmod>
+    </url>
+    
+</urlset>
